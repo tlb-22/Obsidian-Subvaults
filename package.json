@@ -1,0 +1,24 @@
+{
+  "name": "obsidian-subvaults",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Folder-based views of the native Obsidian file explorer.",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "build": "npm run check && node scripts/build.mjs",
+    "package:release": "node scripts/package-release.mjs",
+    "dev": "node scripts/build.mjs --watch",
+    "sync:debug": "npm run build && node scripts/sync-debug.mjs",
+    "screenshots": "npm run build && node --import tsx scripts/capture-readme-images.ts",
+    "screenshots:check": "node --import tsx scripts/check-readme-images.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "1.13.1",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3"
+  }
+}

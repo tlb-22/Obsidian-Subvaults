@@ -1,0 +1,8 @@
+.DS_Store
+.vscode/
+reference/
+.prompt.txt
+TestVaults/
+node_modules/
+dist/
+.artifacts/

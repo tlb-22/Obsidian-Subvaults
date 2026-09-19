@@ -1,0 +1,9 @@
+{
+  "id": "subvaults",
+  "name": "Subvaults",
+  "version": "0.1.0",
+  "minAppVersion": "1.13.7",
+  "description": "Browse folders as subvaults in the native file explorer.",
+  "author": "tlb-22",
+  "isDesktopOnly": true
+}
