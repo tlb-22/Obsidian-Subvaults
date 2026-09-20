@@ -56,6 +56,6 @@ export async function publishImages(project: string, directory: string, staging:
   for (const readme of readmes) await writeFile(readme.path, readme.content);
   await checkReadmeImages(project, directory);
   const keep = new Set(record.images.map(image => image.file));
-  for (const file of await readdir(directory)) if (/^(all|subvault)-v\d+\.\d+\.\d+-(en|zh-Hans)\.png$/.test(file) && !keep.has(file)) await unlink(join(directory, file));
+  for (const file of await readdir(directory)) if (/^(all|subvault|create)-v\d+\.\d+\.\d+-(en|zh-Hans)\.png$/.test(file) && !keep.has(file)) await unlink(join(directory, file));
   console.log(`Updated ${relative(project, directory)} and both README files.`);
 }

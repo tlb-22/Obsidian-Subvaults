@@ -2,6 +2,7 @@
   "name": "obsidian-subvaults",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Folder-based views of the native Obsidian file explorer.",
   "type": "module",
   "scripts": {

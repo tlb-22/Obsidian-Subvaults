@@ -7,9 +7,11 @@ export const languages = [
   { id: 'zh-Hans', obsidian: 'zh', newNote: '新建笔记', readme: 'README.zh-Hans.md' },
 ] as const;
 export type Language = typeof languages[number];
-export const scenes = ['all', 'subvault'] as const;
+export const scenes = ['all', 'subvault', 'create'] as const;
 export type Scene = typeof scenes[number];
-export const viewport = { width: 1120, height: 720, scale: 2 } as const;
+export const viewport = { width: 1120, height: 520, scale: 2 } as const;
+export interface CaptureArea { readonly x: number; readonly y: number; readonly width: number; readonly height: number }
+export const newSubvault = { folder: 'Leisure', icon: 'gamepad-2', color: 'Orange' } as const;
 export const researchId = subvaultId('22222222-2222-4222-8222-222222222222');
 export const activeNote = 'Research/Attention & memory.md';
 export const externalNote = 'Learning/Reading plan.md';
@@ -21,7 +23,6 @@ export const pluginData: PluginDocument = {
   subvaults: [
     { id: subvaultId('11111111-1111-4111-8111-111111111111'), root: folderPath('Learning'), icon: iconId('graduation-cap'), color: 'blue' },
     { id: researchId, root: folderPath('Research'), icon: iconId('flask-conical'), color: 'purple' },
-    { id: subvaultId('33333333-3333-4333-8333-333333333333'), root: folderPath('Leisure'), icon: iconId('gamepad-2'), color: 'orange' },
   ],
   navigation: { selection: { kind: 'all' }, positions: [] },
 };

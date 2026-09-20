@@ -43,7 +43,7 @@ async function capture(): Promise<void> {
         for (const scene of scenes) {
           const request: SceneRequest = { vault, pluginId: manifest.id, version: manifest.version, language: language.obsidian, newNote: language.newNote, scene };
           const observation = await client.evaluate<Observation>(`ScreenshotHost.prepare(${JSON.stringify(request)})`);
-          const bytes = await client.screenshot(), file = imageName(scene, manifest.version, language.id);
+          const bytes = await client.screenshot(observation.area), file = imageName(scene, manifest.version, language.id);
           await writeFile(join(directories.previews, file), bytes);
           images.push({ scene, language: language.id, file, sha256: digest(bytes), observation });
         }

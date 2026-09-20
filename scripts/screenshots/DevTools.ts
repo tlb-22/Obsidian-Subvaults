@@ -1,4 +1,5 @@
 /** 仅连接截图进程发布的本机 DevTools 端点，封装请求寿命、求值及真实页面截图。 */
+import type { CaptureArea } from './Scenarios';
 interface Reply { id?: number; result?: unknown; error?: { message: string } }
 interface Evaluation { result: { value?: unknown }; exceptionDetails?: { text: string; exception?: { description?: string } } }
 interface Pending { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }
@@ -48,8 +49,8 @@ export class DevTools {
     await this.request('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: scale, mobile: false });
     await this.request('Page.bringToFront');
   }
-  async screenshot(): Promise<Buffer> {
-    const result = await this.request<{ data: string }>('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
+  async screenshot(area: CaptureArea): Promise<Buffer> {
+    const result = await this.request<{ data: string }>('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false, clip: { ...area, scale: 1 } });
     return Buffer.from(result.data, 'base64');
   }
   close(): void { this.socket.close(); }

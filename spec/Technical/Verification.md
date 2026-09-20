@@ -7,7 +7,7 @@
 | `npm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
 | `npm test` | 10 项纯规则与应用协作测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
-| `npm run screenshots` | 独立截图 vault 中的中英文 All、Research 四张真实界面 | 通过 |
+| `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 通过 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
 | `npm run package:release -- 0.1.0` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 
@@ -15,7 +15,7 @@
 
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
-[截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言不符、README 区块更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，四张图片经查看确认 All 与 Research 导航、外部文件分组及本地化状态栏正确；场景记录保存在该次 `.artifacts/scratch/previews/<run>/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+[截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260920-054950-319-readme-capture-5697/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
 
 [GitHub Actions](ContinuousIntegration.md) 已于 2026-09-19 在项目 private repo 完成实测：[主分支检查](https://github.com/tlb-22/Obsidian-Subvaults/actions/runs/35453000270)通过且跳过发布，[0.1.0 标签流程](https://github.com/tlb-22/Obsidian-Subvaults/actions/runs/35453078276)完成检查与发布。下载的四个 Release 附件与对应 CI 产物逐字节一致，三个安装文件也与本地构建一致；ZIP 根目录恰含这三个文件且内容一致。日志及核对结果按 `ci-verification` 运行保存于 `.artifacts/scratch/`。
 

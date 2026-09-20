@@ -1,5 +1,5 @@
 /** 检查版本化图片与单次捕获记录；不读取文件或调用截图宿主。 */
-import { imageName, languages, scenes, type Language, type Scene } from './Scenarios';
+import { imageName, languages, newSubvault, scenes, type Language, type Scene } from './Scenarios';
 import type { Observation } from './HostScene';
 
 export interface ImageRecord {
@@ -33,16 +33,24 @@ export function captureIssues(version: string, sourceDigest: string, record: Cap
     if (fact?.kind !== 'present') continue;
     if (!image || fact.sha256 !== image.sha256) issues.push({ kind: 'content', file });
     if (image && (image.language !== language.id || image.observation.language !== language.obsidian || image.observation.nativeNewNote !== language.newNote)) issues.push({ kind: 'language', file });
-    if (image && (image.scene !== scene || image.observation.heading !== (scene === 'all' ? 'All' : 'Research'))) issues.push({ kind: 'scene', file });
+    if (image && (image.scene !== scene || !matchesScene(scene, image.observation))) issues.push({ kind: 'scene', file });
   }
   return issues;
 }
 
-export function readmeReferences(content: string): readonly string[] { return content.match(/\.docs\/images\/(?:all|subvault)-[^\s"')/]+\.png/g) ?? []; }
+function matchesScene(scene: Scene, { view }: Observation): boolean {
+  if (scene === 'create') return view.kind === 'create' && view.folder === newSubvault.folder && view.icon === newSubvault.icon && view.color === newSubvault.color;
+  return view.kind === 'navigation' && view.heading === (scene === 'all' ? 'All' : 'Research');
+}
+
+export function readmeReferences(content: string): readonly string[] { return content.match(/\.docs\/images\/(?:all|subvault|create)-[^\s"')/]+\.png/g) ?? []; }
 
 export function readmeBlock(language: Language, version: string): string {
-  const labels = language.id === 'en' ? ['All: learning, research, and leisure in one vault', 'Research subvault with an open file from Learning'] : ['All：在同一 vault 中组织学习、研究与娱乐', 'Research subvault：聚焦研究文件夹，并保留已打开的学习笔记'];
-  return ['<!-- screenshots:start -->', ...scenes.map((scene, index) => `<p align="center">\n  <img src=".docs/images/${imageName(scene, version, language.id)}" width="100%" alt="${labels[index]}">\n</p>`), '<!-- screenshots:end -->'].join('\n\n');
+  const labels = language.id === 'en' ? ['All: learning, research, and leisure in one vault', 'Research subvault with an open file from Learning', 'Creating a Leisure subvault with an orange gamepad icon'] : ['All：在同一 vault 中组织学习、研究与娱乐', 'Research subvault：聚焦研究文件夹，并保留已打开的学习笔记', '为 Leisure 文件夹创建 subvault，使用橙色游戏手柄图标'];
+  const headings = ['All', 'Research', language.id === 'en' ? 'Create a subvault' : '新建 subvault'];
+  const images = scenes.map((scene, index) => `<img src=".docs/images/${imageName(scene, version, language.id)}" width="240" alt="${labels[index]}">`);
+  const table = ['<table>', '  <tr>', ...headings.map(heading => `    <th width="33.33%">${heading}</th>`), '  </tr>', '  <tr>', ...images.map(image => `    <td>${image}</td>`), '  </tr>', '</table>'].join('\n');
+  return ['<!-- screenshots:start -->', table, '<!-- screenshots:end -->'].join('\n\n');
 }
 
 export function updateReadme(content: string, language: Language, version: string): string {

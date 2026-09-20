@@ -18,13 +18,18 @@ Inspired by [obsidian-spaces](https://github.com/psjdev/obsidian-spaces).
 
 <!-- screenshots:start -->
 
-<p align="center">
-  <img src=".docs/images/all-v0.1.0-en.png" width="100%" alt="All: learning, research, and leisure in one vault">
-</p>
-
-<p align="center">
-  <img src=".docs/images/subvault-v0.1.0-en.png" width="100%" alt="Research subvault with an open file from Learning">
-</p>
+<table>
+  <tr>
+    <th width="33.33%">All</th>
+    <th width="33.33%">Research</th>
+    <th width="33.33%">Create a subvault</th>
+  </tr>
+  <tr>
+    <td><img src=".docs/images/all-v0.1.0-en.png" width="240" alt="All: learning, research, and leisure in one vault"></td>
+    <td><img src=".docs/images/subvault-v0.1.0-en.png" width="240" alt="Research subvault with an open file from Learning"></td>
+    <td><img src=".docs/images/create-v0.1.0-en.png" width="240" alt="Creating a Leisure subvault with an orange gamepad icon"></td>
+  </tr>
+</table>
 
 <!-- screenshots:end -->
 
@@ -53,3 +58,7 @@ npm run build
 ```
 
 The plugin files are generated in `dist/`. See [project specifications](spec/Main.md) for development and verification details.
+
+## License
+
+[MIT](LICENSE)
