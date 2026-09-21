@@ -35,7 +35,7 @@ function prepareCreation(container: HTMLElement): SceneView {
   chosenColor.click();
   control(panel, `.sv-folder-row[data-sv-folder="${newSubvault.folder}"]`).click();
   const folder = control(panel, '.sv-folder-row[aria-selected="true"]').dataset.svFolder!;
-  const create = control<HTMLButtonElement>(panel, '.sv-create-footer .mod-cta');
+  const create = control<HTMLButtonElement>(panel, '.sv-create-footer .sv-primary');
   if (create.disabled || panel.querySelector('.sv-inline-error')?.textContent) throw new Error('Screenshot creation form is not ready to submit');
   (document.activeElement as HTMLElement).blur();
   return { kind: 'create', folder, icon: icon.dataset.icon!, color: colorName };

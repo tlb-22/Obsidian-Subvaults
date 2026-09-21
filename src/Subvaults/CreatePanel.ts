@@ -32,14 +32,16 @@ export class CreatePanel {
     this.previousFocus = host.ownerDocument.activeElement as HTMLElement | null;
     this.covered = Array.from(host.children).filter((el): el is HTMLElement => el instanceof host.ownerDocument.defaultView!.HTMLElement).map(el => ({ el, inert: el.inert }));
     for (const item of this.covered) item.el.inert = true;
-    this.panel = host.createDiv({ cls: 'sv-create-panel', attr: { role: 'dialog' } });
+    this.panel = host.createDiv({ cls: 'sv-ui sv-create-panel', attr: { role: 'dialog' } });
     labelRegion(this.panel, 'Create subvault');
     const actions = this.panel.createDiv('sv-create-appearance');
     this.icon = new ButtonComponent(actions).onClick(() => this.picker.icon(this.icon, this.form.appearance.icon, icon => this.setAppearance({ ...this.form.appearance, icon }))).buttonEl;
+    this.icon.classList.add('sv-button');
     this.iconImage = this.icon.createSpan();
     this.icon.createSpan({ text: 'Icon' });
     tooltip(this.icon, 'Icon');
     this.color = new ButtonComponent(actions).onClick(() => this.picker.color(this.color, this.form.appearance.color, color => this.setAppearance({ ...this.form.appearance, color }))).buttonEl;
+    this.color.classList.add('sv-button');
     this.colorImage = this.color.createSpan(); setIcon(this.colorImage, 'palette');
     this.color.createSpan({ text: 'Color' });
     tooltip(this.color, 'Color');
@@ -51,7 +53,9 @@ export class CreatePanel {
     this.error = this.panel.createDiv({ cls: 'sv-inline-error', attr: { role: 'alert' } });
     const footer = this.panel.createDiv('sv-create-footer');
     this.cancel = new ButtonComponent(footer).setButtonText('Cancel').onClick(() => this.done());
-    this.create = new ButtonComponent(footer).setButtonText('Create').setCta().onClick(() => { void this.submit(); });
+    this.cancel.buttonEl.classList.add('sv-button');
+    this.create = new ButtonComponent(footer).setButtonText('Create').onClick(() => { void this.submit(); });
+    this.create.buttonEl.classList.add('sv-button', 'sv-primary');
     this.panel.addEventListener('keydown', event => { if (event.key === 'Escape' && this.form.kind === 'editing') { event.preventDefault(); event.stopPropagation(); this.done(); } });
     this.unsubscribe = catalog.subscribe(() => this.refresh());
     this.refresh(); search.inputEl.focus();
@@ -80,12 +84,12 @@ export class CreatePanel {
       let row = this.rows.get(model.path);
       if (!row) {
         const el = this.tree.ownerDocument.createElement('div');
-        el.className = 'tree-item-self nav-folder-title sv-folder-row';
+        el.className = 'sv-folder-row';
         el.setAttribute('role', 'treeitem'); el.tabIndex = 0; el.dataset.svFolder = model.path;
-        const disclosure = el.createSpan('tree-item-icon collapse-icon');
+        const disclosure = el.createSpan('sv-folder-toggle');
         setIcon(disclosure, 'chevron-right');
         const icon = el.createSpan('sv-folder-icon'); setIcon(icon, 'folder');
-        el.createSpan({ cls: 'tree-item-inner nav-folder-title-content', text: model.name });
+        el.createSpan({ cls: 'sv-folder-name', text: model.name });
         const toggle = () => { if (this.expanded.has(model.path)) this.expanded.delete(model.path); else this.expanded.add(model.path); this.renderTree(); };
         disclosure.addEventListener('click', e => { e.stopPropagation(); toggle(); });
         el.addEventListener('click', () => this.select(model.path));
@@ -98,11 +102,10 @@ export class CreatePanel {
         row = { el, disclosure }; this.rows.set(model.path, row);
       }
       const selected = this.form.root === model.path, bound = this.catalog.items.some(s => s.root === model.path);
-      row.el.classList.toggle('is-active', selected); row.el.classList.toggle('sv-folder-bound', bound);
       row.el.setAttribute('aria-selected', String(selected)); row.el.setAttribute('aria-disabled', String(bound));
       row.el.style.setProperty('--sv-depth', String(model.depth));
       row.disclosure.style.visibility = model.hasChildren ? 'visible' : 'hidden';
-      row.disclosure.classList.toggle('is-collapsed', !this.expanded.has(model.path) && !this.query);
+      row.disclosure.classList.toggle('sv-collapsed', !this.expanded.has(model.path) && !this.query);
       if (model.hasChildren) row.el.setAttribute('aria-expanded', String(this.expanded.has(model.path) || !!this.query));
       tooltip(row.el, bound ? `${model.path}\nAlready has a subvault` : model.path);
       if (cursor !== row.el) this.tree.insertBefore(row.el, cursor); else cursor = cursor.nextElementSibling;

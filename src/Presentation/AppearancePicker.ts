@@ -10,7 +10,7 @@ export class AppearancePicker {
   private open(anchor: HTMLElement, label: string): { panel: HTMLElement; reposition: () => void } {
     this.close();
     const doc = anchor.ownerDocument, win = doc.defaultView!;
-    const panel = doc.body.createDiv({ cls: 'sv-picker popover', attr: { role: 'dialog' } });
+    const panel = doc.body.createDiv({ cls: 'sv-ui sv-picker', attr: { role: 'dialog' } });
     labelRegion(panel, label);
     const reposition = () => {
       const rect = anchor.getBoundingClientRect(), bounds = panel.getBoundingClientRect();
@@ -33,7 +33,7 @@ export class AppearancePicker {
     return { panel, reposition };
   }
   private cell(grid: HTMLElement, label: string, selected: boolean, choose: () => void): HTMLButtonElement {
-    const button = grid.createEl('button', { cls: 'sv-picker-cell', attr: { type: 'button', 'aria-pressed': String(selected) } });
+    const button = grid.createEl('button', { cls: 'sv-button sv-picker-cell', attr: { type: 'button', 'aria-pressed': String(selected) } });
     tooltip(button, label); button.addEventListener('click', choose);
     return button;
   }

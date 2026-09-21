@@ -2,8 +2,10 @@
 import { setIcon, setTooltip } from 'obsidian';
 import type { IconColor } from '../Subvaults/Subvault';
 export const colorValue: Readonly<Record<IconColor, string>> = {
-  default: 'var(--text-muted)', red: 'var(--color-red)', orange: 'var(--color-orange)', yellow: 'var(--color-yellow)', lime: '#a3be4c', green: 'var(--color-green)',
-  teal: '#3ba99c', cyan: 'var(--color-cyan)', blue: 'var(--color-blue)', purple: 'var(--color-purple)', pink: 'var(--color-pink)', brown: '#a67c52',
+  default: 'var(--text-muted)', red: 'var(--color-red)', orange: 'var(--color-orange)', yellow: 'var(--color-yellow)',
+  lime: 'color-mix(in srgb, var(--color-yellow), var(--color-green))', green: 'var(--color-green)',
+  teal: 'color-mix(in srgb, var(--color-green), var(--color-cyan))', cyan: 'var(--color-cyan)', blue: 'var(--color-blue)',
+  purple: 'var(--color-purple)', pink: 'var(--color-pink)', brown: 'color-mix(in srgb, var(--color-orange) 65%, var(--text-muted))',
 };
 export function tooltip(el: HTMLElement, label: string): void {
   if (el.getAttribute('aria-label') !== label) setTooltip(el, label, { placement: 'top' });
@@ -15,6 +17,6 @@ export function labelRegion(el: HTMLElement, label: string, host = el): void {
   el.setAttribute('aria-labelledby', text.id);
 }
 export function iconButton(parent: HTMLElement, icon: string, label: string, action: (event: MouseEvent) => void): HTMLButtonElement {
-  const button = parent.createEl('button', { cls: 'clickable-icon sv-icon-button', attr: { type: 'button' } });
+  const button = parent.createEl('button', { cls: 'sv-button sv-icon-button', attr: { type: 'button' } });
   setIcon(button, icon); tooltip(button, label); button.addEventListener('click', action); return button;
 }

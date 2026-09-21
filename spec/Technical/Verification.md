@@ -10,6 +10,7 @@
 | `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 通过 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
 | `npm run package:release -- 0.1.0` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 
 [领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入及导航恢复。
 
@@ -43,7 +44,17 @@
 
 `npm run dev` 监听 TypeScript 源码，将开发构建写入 `dist/`；启动构建时同时复制 `src/styles.css` 和 manifest。修改 CSS 后运行 `npm run sync:debug` 并重新加载插件以检查效果。同步目录由构建 manifest 的插件 ID 决定。`TestVaults/`、`dist/` 和 `.artifacts/` 均为本地开发目录，由 Git 忽略。
 
-## 当前实机证据
+## 主题实机验证
+
+2026-09-21，在 Obsidian 1.13.7 的 Debug-Vault 重载当前构建后完成 24 组检查：默认主题、Catppuccin 0.4.49、Minimal 9.0.2，分别覆盖深浅色模式及 140、180、240、320 px 宽度。Catppuccin 样式取自本机安装版本，Minimal 取自[官方 9.0.2 源码](https://github.com/kepano/obsidian-minimal/tree/9.0.2)。
+
+脚本将完整主题 CSS 临时放在插件样式之后加载，检查切换按钮与图标尺寸、身份色、选中标记、主按钮及外部文件选中配色、统一圆角、上下操作行对齐、图标和颜色网格、视口边界、选择与键盘焦点恢复。报告为 `.artifacts/scratch/tests/20260921-052538-273-appearance-verification-21544/results.json`。默认主题及 Catppuccin 的创建面板、颜色弹层、切换条另经目视检查。
+
+同日，在最初报告问题的 vault 保持 Catppuccin 与原有 CSS 片段的环境中更新、重载并目视确认。3 个已有 subvault 的配置一致；创建面板四个操作按钮的圆角均为 4 px，选择有效文件夹后 Create 可用，其背景等于宿主强调色。
+
+在 Debug-Vault 中先打开 `Outside.md`，再从开发控制台调用[验收脚本](../../tests/obsidian/verify-appearance.cjs)。第二个参数接收 `{ name, css }` 主题数组；空数组检查默认主题。主题文件保存在 `.artifacts` 的调查目录，脚本结束后恢复原来的深浅模式与视图选择。该验证覆盖直接加载主题 CSS 的情况，主题配套插件与额外样式设置需独立验证。界面样式契约见[界面与主题](InterfaceAppearance.md)。
+
+## 功能与交互实机证据
 
 验证日期：2026-09-19。已同步构建并重新加载 Debug-Vault。
 
@@ -63,7 +74,7 @@
 
 ## 未验证范围
 
-逐帧连续采样与补充脚本的卸载提示清理尚未形成完成记录；窗口隐藏会暂停动画帧，不能据此判断闪动。核心脚本已验证标题节点身份稳定和插件卸载恢复。其他 Obsidian 版本、非默认主题、多窗口组合和第三方文件树替换仍需各自的实机验证。
+逐帧连续采样与补充脚本的卸载提示清理尚未形成完成记录；窗口隐藏会暂停动画帧，不能据此判断闪动。核心脚本已验证标题节点身份稳定和插件卸载恢复。其他 Obsidian 版本、上述范围以外的主题及附加设置、多窗口组合和第三方文件树替换仍需各自的实机验证。
 
 ## 公开文件检查
 
