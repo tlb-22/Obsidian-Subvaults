@@ -56,8 +56,7 @@
 
 /* 原生文件树只增加外部文件的身份和分组标记，其余继续使用宿主样式。 */
 .sv-external > .tree-item-self { font-style: italic; }
-.sv-external-first { position: relative; }
-.sv-external-first > .tree-item-self { border-top: 16px solid transparent; background-clip: padding-box; }
+.sv-external-first { position: relative; padding-top: 16px; }
 .sv-external-first::before { content: ''; position: absolute; top: 7px; left: 0; right: 0; border-top: 1px solid var(--background-modifier-border); pointer-events: none; }
 
 /* 创建面板、选择树和两行操作共用控件基线。 */

@@ -53,6 +53,8 @@
 
 同日，在最初报告问题的 vault 保持 Catppuccin 与原有 CSS 片段的环境中更新、重载并目视确认。3 个已有 subvault 的配置一致；创建面板四个操作按钮的圆角均为 4 px，选择有效文件夹后 Create 可用，其背景等于宿主强调色。
 
+首个外部文件选中样式另在 Debug-Vault 完成默认主题、Catppuccin 和 Minimal 的深浅模式共 6 组测量：四角圆角、边框、背景裁剪、配色及文件行尺寸均与同主题原生行一致，分隔间距和条目总高度保持稳定，文件行可正常点击。Catppuccin 浅色下经目视确认，报告为 `.artifacts/scratch/probes/20260921-060926-585-external-corners-review-25182/results.json`。
+
 在 Debug-Vault 中先打开 `Outside.md`，再从开发控制台调用[验收脚本](../../tests/obsidian/verify-appearance.cjs)。第二个参数接收 `{ name, css }` 主题数组；空数组检查默认主题。主题文件保存在 `.artifacts` 的调查目录，脚本结束后恢复原来的深浅模式与视图选择。该验证覆盖直接加载主题 CSS 的情况，主题配套插件与额外样式设置需独立验证。界面样式契约见[界面与主题](InterfaceAppearance.md)。
 
 ## 功能与交互实机证据
