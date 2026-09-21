@@ -9,7 +9,7 @@
 | `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
 | `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 通过 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
-| `npm run package:release -- 0.1.0` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `npm run package:release -- 0.1.1` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
 
@@ -17,7 +17,9 @@
 
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
-[截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260920-054950-319-readme-capture-5697/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+[截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260921-082649-537-readme-capture-38153/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+
+0.1.1 本地发布准备已通过全部 18 项测试、类型检查和截图引用检查。`.artifacts/releases/0.1.1/` 的三个安装文件、ZIP 内文件及 Debug-Vault 安装文件与构建输出逐字节一致；ZIP 根目录恰含三个安装文件。中英文隔离截图实例均确认加载 0.1.1 并通过场景检查，六张图片与已目视检查的版本逐字节一致。Debug-Vault 已重载并确认运行 0.1.1，该构建的主题与拖拽验收见下文。本版本的远程 CI 与发布尚未执行。
 
 [GitHub Actions](ContinuousIntegration.md) 已于 2026-09-19 在项目 private repo 完成实测：[主分支检查](https://github.com/tlb-22/Obsidian-Subvaults/actions/runs/35453000270)通过且跳过发布，[0.1.0 标签流程](https://github.com/tlb-22/Obsidian-Subvaults/actions/runs/35453078276)完成检查与发布。下载的四个 Release 附件与对应 CI 产物逐字节一致，三个安装文件也与本地构建一致；ZIP 根目录恰含这三个文件且内容一致。日志及核对结果按 `ci-verification` 运行保存于 `.artifacts/scratch/`。
 

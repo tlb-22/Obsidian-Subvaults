@@ -25,9 +25,9 @@ Inspired by [obsidian-spaces](https://github.com/psjdev/obsidian-spaces).
     <th width="33.33%">Create a subvault</th>
   </tr>
   <tr>
-    <td><img src=".docs/images/all-v0.1.0-en.png" width="240" alt="All: learning, research, and leisure in one vault"></td>
-    <td><img src=".docs/images/subvault-v0.1.0-en.png" width="240" alt="Research subvault with an open file from Learning"></td>
-    <td><img src=".docs/images/create-v0.1.0-en.png" width="240" alt="Creating a Leisure subvault with an orange gamepad icon"></td>
+    <td><img src=".docs/images/all-v0.1.1-en.png" width="240" alt="All: learning, research, and leisure in one vault"></td>
+    <td><img src=".docs/images/subvault-v0.1.1-en.png" width="240" alt="Research subvault with an open file from Learning"></td>
+    <td><img src=".docs/images/create-v0.1.1-en.png" width="240" alt="Creating a Leisure subvault with an orange gamepad icon"></td>
   </tr>
 </table>
 
