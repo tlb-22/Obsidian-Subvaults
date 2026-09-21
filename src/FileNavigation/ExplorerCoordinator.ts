@@ -3,6 +3,7 @@ import { FileView, type App, type WorkspaceLeaf } from 'obsidian';
 import type { SubvaultCatalog } from '../Subvaults/SubvaultCatalog';
 import { CreatePanel } from '../Subvaults/CreatePanel';
 import { SubvaultMenu } from '../Subvaults/SubvaultMenu';
+import { failureMessage } from '../Subvaults/SubvaultFeedback';
 import { outsideFiles, sameSelection, type Selection } from './NavigationState';
 import type { NavigationSession } from './NavigationSession';
 import { NativeExplorer, type ExplorerScope } from './NativeExplorer';
@@ -21,7 +22,11 @@ class ExplorerPane {
     this.native = new NativeExplorer(app, leaf, report);
     this.native.container.addClass('sv-explorer');
     this.menu = new SubvaultMenu(catalog);
-    try { this.chrome = new ExplorerChrome(this.native.container, this.native.scrollContainer, s => navigation.switchTo(s), () => this.create(), (e, button, id) => this.menu.open(e, button, id)); }
+    try {
+      this.chrome = new ExplorerChrome(this.native.container, this.native.scrollContainer,
+        s => navigation.switchTo(s), () => this.create(), (e, button, id) => this.menu.open(e, button, id),
+        (id, position) => { void catalog.move(id, position).then(result => { if (!result.ok) report(new Error(failureMessage(result.error))); }).catch(report); });
+    }
     catch (error) { this.menu.dispose(); this.native.dispose(); this.native.container.removeClass('sv-explorer'); throw error; }
     this.scroll = () => {
       if (!this.shown || this.native.scrollContainer.clientHeight === 0) return;

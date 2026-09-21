@@ -45,7 +45,7 @@ Requires Obsidian desktop 1.13.7 or later. The plugin interface is currently in 
 
 1. Click **+** at the bottom of the file explorer.
 2. Select a working folder. Use **Icon** and **Color** to customize its appearance.
-3. Click **Create**, then use the bottom icons to switch views.
+3. Click **Create**, then use the bottom icons to switch views. Drag subvault icons to reorder them; the order is saved automatically.
 4. Right-click a subvault icon to change its appearance or remove the view. Removing a subvault keeps its folder and files.
 
 ## Building from Source

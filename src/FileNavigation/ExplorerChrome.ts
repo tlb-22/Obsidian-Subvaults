@@ -3,6 +3,8 @@ import { setIcon } from 'obsidian';
 import { folderName, type Subvault, type SubvaultId } from '../Subvaults/Subvault';
 import { colorValue, iconButton, labelRegion, tooltip } from '../Presentation/Controls';
 import { all, type Selection } from './NavigationState';
+import type { SubvaultPosition } from '../Subvaults/SubvaultOrder';
+import { SwitcherDrag } from './SwitcherDrag';
 export class ExplorerChrome {
   private readonly header: HTMLElement;
   private readonly titleIcon: HTMLElement;
@@ -10,8 +12,9 @@ export class ExplorerChrome {
   private readonly strip: HTMLElement;
   private readonly rail: HTMLElement;
   private readonly allButton: HTMLButtonElement;
+  private readonly drag: SwitcherDrag;
   private readonly buttons = new Map<SubvaultId, HTMLButtonElement>();
-  constructor(host: HTMLElement, scroll: HTMLElement, switchTo: (selection: Selection) => void, create: () => void, menu: (event: MouseEvent, button: HTMLElement, id: SubvaultId) => void) {
+  constructor(host: HTMLElement, scroll: HTMLElement, switchTo: (selection: Selection) => void, create: () => void, menu: (event: MouseEvent, button: HTMLElement, id: SubvaultId) => void, move: (id: SubvaultId, position: SubvaultPosition) => void) {
     this.header = host.ownerDocument.createElement('div');
     this.header.className = 'sv-ui sv-header';
     this.titleIcon = this.header.createSpan('sv-header-icon');
@@ -21,11 +24,14 @@ export class ExplorerChrome {
     labelRegion(this.strip, 'Subvaults');
     this.allButton = iconButton(this.strip, 'layers', 'All', () => switchTo(all));
     this.rail = this.strip.createDiv('sv-switcher-rail');
+    this.drag = new SwitcherDrag(this.rail, move);
     iconButton(this.strip, 'plus', 'Create subvault', create);
     this.rail.addEventListener('wheel', event => { if (this.rail.scrollWidth > this.rail.clientWidth && Math.abs(event.deltaY) > Math.abs(event.deltaX)) { this.rail.scrollLeft += event.deltaY; event.preventDefault(); } }, { passive: false });
     this.makeButton = subvault => {
       const button = iconButton(this.rail, subvault.icon, subvault.root, () => switchTo({ kind: 'subvault', id: subvault.id }));
       button.dataset.subvaultId = subvault.id;
+      button.draggable = true;
+      button.setAttribute('aria-description', 'Drag to reorder');
       button.addEventListener('contextmenu', event => { event.preventDefault(); menu(event, button, subvault.id); });
       return button;
     };
@@ -41,6 +47,8 @@ export class ExplorerChrome {
     this.allButton.setAttribute('aria-pressed', String(!active));
     const ids = new Set(subvaults.map(s => s.id));
     for (const [id, button] of this.buttons) if (!ids.has(id)) { button.remove(); this.buttons.delete(id); }
+    const focused = this.rail.ownerDocument.activeElement;
+    const scrollLeft = this.rail.scrollLeft;
     let cursor = this.rail.firstElementChild;
     for (const s of subvaults) {
       let button = this.buttons.get(s.id);
@@ -51,6 +59,9 @@ export class ExplorerChrome {
       tooltip(button, s.root);
       if (cursor !== button) this.rail.insertBefore(button, cursor); else cursor = cursor.nextElementSibling;
     }
+    if (focused && this.rail.contains(focused) && this.rail.ownerDocument.activeElement !== focused) (focused as HTMLElement).focus({ preventScroll: true });
+    this.rail.scrollLeft = scrollLeft;
+    this.drag.refresh();
   }
-  dispose(): void { this.header.remove(); this.strip.remove(); }
+  dispose(): void { this.drag.dispose(); this.header.remove(); this.strip.remove(); }
 }

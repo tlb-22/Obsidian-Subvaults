@@ -14,6 +14,8 @@
 
 公开接口依据：[官方类型定义仓库](https://github.com/obsidianmd/obsidian-api)、[插件开发文档](https://docs.obsidian.md/)。
 
+Obsidian 1.13.7 的本地源码观察确认：原生提示在带 `aria-label` 的元素上委托处理 `pointerover` / `pointerout`，退出时同时取消显示计时器并移除当前提示。[Controls](../../src/Presentation/Controls.ts) 在切换条拖动开始时发送退出事件，复用这条清理路径；该行为属于宿主实现观察，验证结果见[验证记录](Verification.md)。
+
 ## 原生文件导航内部接口
 
 下列成员未由公开的文件导航 API 承诺，集中在 [NativeExplorer](../../src/FileNavigation/NativeExplorer.ts)。表中宿主行为是在 Obsidian 1.13.7 的 Debug-Vault 中读取方法实现所得的源码观察，实际插件协作结果以[验证记录](Verification.md)为准。

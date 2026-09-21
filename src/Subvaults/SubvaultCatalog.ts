@@ -1,5 +1,6 @@
 /** 串行协调配置变更与已发生的文件夹事件，独占当前 subvault 清单并发布结果。 */
 import { createSubvault, followFolderChange, type Appearance, type FolderChange, type FolderPath, type Outcome, type Subvault, type SubvaultFailure, type SubvaultId } from './Subvault';
+import { moveSubvault, type SubvaultPosition } from './SubvaultOrder';
 
 export interface CatalogStorage { saveSubvaults(value: readonly Subvault[]): Promise<void> }
 export class SubvaultCatalog {
@@ -39,6 +40,13 @@ export class SubvaultCatalog {
     return this.enqueue(() => this.current.some(s => s.id === id)
       ? this.commit(this.current.filter(s => s.id !== id))
       : Promise.resolve({ ok: false, error: { kind: 'subvault-removed' } }));
+  }
+  move(id: SubvaultId, position: SubvaultPosition): Promise<Outcome<void, SubvaultFailure>> {
+    return this.enqueue(async () => {
+      const plan = moveSubvault(this.current, id, position);
+      if (!plan.ok) return plan;
+      return plan.value === this.current ? { ok: true, value: undefined } : this.commit(plan.value);
+    });
   }
   observe(change: FolderChange): Promise<Outcome<void, SubvaultFailure>> {
     return this.enqueue(async () => {

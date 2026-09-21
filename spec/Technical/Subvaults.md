@@ -1,6 +1,6 @@
 # Subvault 管理
 
-本能力实现[管理需求](../Requirements/Subvaults.md)。[SubvaultCatalog](../../src/Subvaults/SubvaultCatalog.ts) 是应用操作入口，管理创建、外观修改、移除及文件夹生命周期。
+本能力实现[管理需求](../Requirements/Subvaults.md)。[SubvaultCatalog](../../src/Subvaults/SubvaultCatalog.ts) 是应用操作入口，管理创建、排序、外观修改、移除及文件夹生命周期。
 
 ## 操作流程
 
@@ -13,11 +13,14 @@
 | 模块 | 责任与输入 / 输出 | 源码 |
 | --- | --- | --- |
 | 领域值与规则 | 有效身份、路径及外观；当前清单与文件夹事实 → 创建结果或变更后的清单 | [Subvault](../../src/Subvaults/Subvault.ts) |
+| 排序规则 | 待移动身份、相邻身份与前后位置 → 新清单或已移除失败 | [SubvaultOrder](../../src/Subvaults/SubvaultOrder.ts) |
 | 配置操作 | 用户意图或文件夹变化 → 已完成结果或预期失败；串行维护唯一性检查与提交 | [SubvaultCatalog](../../src/Subvaults/SubvaultCatalog.ts) |
 | 文件夹选择规则 | 路径、展开集合及搜索词 → 可见层级行 | [FolderChoices](../../src/Subvaults/FolderChoices.ts) |
 | 创建交互 | 草稿、单选状态、提交占用及局部树更新 | [CreatePanel](../../src/Subvaults/CreatePanel.ts) |
 | 管理菜单 | 原生右键菜单 → 外观或移除意图 | [SubvaultMenu](../../src/Subvaults/SubvaultMenu.ts) |
 | 外观选择与反馈 | 图标与预设色网格、弹层生命周期及英文失败说明 | [AppearancePicker](../../src/Presentation/AppearancePicker.ts)、[SubvaultFeedback](../../src/Subvaults/SubvaultFeedback.ts) |
+
+排序意图以相邻 subvault 的身份及其前后位置表达。Catalog 在串行队列内按最新清单计算顺序，保留期间创建的项；来源或相邻项已移除时返回失败。顺序不变时不写入或发布，保存完成后由[导航呈现](FileNavigation.md)移动已有节点。
 
 图标与预设色共用锚定弹层、方形单元及选择状态样式。图标清单由 [IconChoices](../../src/Presentation/IconChoices.ts) 维护，选用[候选库](IconChoices.md)中的首批 49 项及其顺序，通过宿主绘制为七列七行网格；打开时完整渲染，滚动范围固定，选中项保留原位。12 个预设色以空心圆环排列为六列两行。单元只显示图形，控件名称通过原生延迟提示提供；键盘方向键在网格中移动焦点。弹层处理外部点击、Escape、窗口变化及关闭后的资源释放。
 

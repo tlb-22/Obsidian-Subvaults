@@ -19,12 +19,15 @@ Coordinator 从当前 subvault 和工作区仍打开的文件生成显示范围�
 | 实例协调 | 宿主布局与会话 → 每个文件导航的显示范围和生命周期 | [ExplorerCoordinator](../../src/FileNavigation/ExplorerCoordinator.ts) |
 | 原生接入 | 显示范围 → 原生条目投影、定位、导航内新建和样式标记 | [NativeExplorer](../../src/FileNavigation/NativeExplorer.ts) |
 | 导航呈现 | 清单与选择 → 固定标题、切换条、管理入口 | [ExplorerChrome](../../src/FileNavigation/ExplorerChrome.ts) |
+| 切换条拖拽 | 原生拖放事件 → 插入提示、边缘滚动及排序意图 | [SwitcherDrag](../../src/FileNavigation/SwitcherDrag.ts) |
 
 ## 操作与稳定性
 
 工具栏的新建操作显式将当前工作文件夹交给原生创建方法。空白处菜单由原生 Menu 构建，将同一目标传给原生创建方法；子文件夹菜单保持原生处理。其他新建入口使用原有函数。
 
 空白处的拖放事件在 subvault 视图中转交工作文件夹自身的原生拖放条目，文件操作继续由原生处理器执行。文件项上的拖放保持原生事件路径。
+
+切换条使用 HTML 拖放事件，只有本条内的 subvault 图标可以发起排序。拖动位置根据按钮中点转换为相邻项的前后位置；提示使用主题强调色，靠近横向滚动区域边缘时按动画帧滚动。拖动开始时通过 [Controls](../../src/Presentation/Controls.ts) 触发原生悬停退出，取消延迟提示并关闭已有提示；拖动期间阻止切换图标的悬停进入事件传到宿主提示处理器，保留无障碍名称。松开后交给 Catalog 保存，取消、移出区域和卸载均清理插入提示与滚动任务。提交后移动已有按钮节点并恢复焦点与切换条滚动位置；当前选择和原生文件树继续使用。存储和预期失败见[Subvault 管理](Subvaults.md)。
 
 外部条目通过专属样式标记区分；首个外部条目承载分隔线。该条目的透明顶部边框为分隔线预留高度，背景裁剪使选中背景从间隔之后开始。MutationObserver 在虚拟滚动插入条目后更新标记和完整路径提示，保持同一个滚动容器。具体视觉样式集中在 [styles.css](../../src/styles.css)。
 

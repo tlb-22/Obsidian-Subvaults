@@ -5,14 +5,15 @@
 | 命令 | 验证范围 | 当前结果 |
 | --- | --- | --- |
 | `npm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
-| `npm test` | 10 项纯规则与应用协作测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
+| `npm test` | 14 项纯规则与应用协作测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
 | `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 通过 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
 | `npm run package:release -- 0.1.0` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
+| `tests/obsidian/verify-reorder.cjs` | 拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 7 项通过；主题覆盖见下文 |
 
-[领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入及导航恢复。
+[领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索、前后排序与失效身份和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入、排序与创建移除的串行协作及导航恢复。
 
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
@@ -55,6 +56,10 @@
 在 Debug-Vault 中先打开 `Outside.md`，再从开发控制台调用[验收脚本](../../tests/obsidian/verify-appearance.cjs)。第二个参数接收 `{ name, css }` 主题数组；空数组检查默认主题。主题文件保存在 `.artifacts` 的调查目录，脚本结束后恢复原来的深浅模式与视图选择。该验证覆盖直接加载主题 CSS 的情况，主题配套插件与额外样式设置需独立验证。界面样式契约见[界面与主题](InterfaceAppearance.md)。
 
 ## 功能与交互实机证据
+
+2026-09-21，同步构建并重新加载 Debug-Vault 后，通过[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs)派发 DOM 拖放事件。默认主题、Catppuccin 0.4.49 和 Minimal 9.0.2 的深浅模式均通过 6 项检查：前后移动保持按钮与文件树节点、焦点和选择；取消清理；固定入口与外部拖放边界；窄侧栏双向边缘滚动；保存失败保留顺序并报错；重载恢复顺序。汇总报告为 `.artifacts/scratch/tests/20260921-055017-970-reorder-theme-matrix-23799/results.json`，各次运行结束后恢复原顺序。该检查覆盖宿主事件与存储协作；系统鼠标拖动因控制工具落点偏离窗口，尚未完成端到端验证。
+
+同日，默认主题下的 7 项排序回归另覆盖原生悬停提示：拖动开始立即关闭已显示提示并取消待显示任务，移出切换条或重新经过其他图标时保持关闭，结束后恢复正常悬停，控件无障碍名称保持不变。报告为 `.artifacts/scratch/tests/20260921-055925-403-reorder-verification-23799/results.json`。
 
 验证日期：2026-09-19。已同步构建并重新加载 Debug-Vault。
 

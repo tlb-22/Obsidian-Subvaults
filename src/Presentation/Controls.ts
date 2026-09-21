@@ -10,6 +10,8 @@ export const colorValue: Readonly<Record<IconColor, string>> = {
 export function tooltip(el: HTMLElement, label: string): void {
   if (el.getAttribute('aria-label') !== label) setTooltip(el, label, { placement: 'top' });
 }
+/** 宿主的 pointerout 处理同时取消延迟任务与已显示提示，保留控件的无障碍名称。 */
+export function dismissTooltip(el: HTMLElement): void { el.dispatchEvent(new Event('pointerout', { bubbles: true })); }
 /** aria-label also creates an Obsidian tooltip; regions use a separate accessible label. */
 export function labelRegion(el: HTMLElement, label: string, host = el): void {
   const text = host.createSpan({ cls: 'sv-visually-hidden', text: label });
