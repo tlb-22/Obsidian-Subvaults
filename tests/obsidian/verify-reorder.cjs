@@ -10,6 +10,8 @@ module.exports = async app => {
   const session = () => app.plugins.plugins.subvaults._children.find(child => child.catalog && child.navigation);
   const rail = () => view.containerEl.querySelector('.sv-switcher-rail');
   const buttons = () => [...rail().children];
+  const marker = () => view.containerEl.querySelector('.sv-drop-marker');
+  const markerCenter = () => { const r = marker().getBoundingClientRect(); return r.left + r.width / 2; };
   const order = () => session().catalog.items.map(s => s.id);
   const original = order(), selection = session().navigation.selection;
   const originalScroll = rail().scrollLeft;
@@ -34,8 +36,8 @@ module.exports = async app => {
   const drop = async (source, anchor, side) => {
     const transfer = begin(source), r = anchor.getBoundingClientRect(), x = side === 'before' ? r.left + 1 : r.right - 1;
     event(rail(), 'dragover', transfer, x);
-    check(anchor.dataset.dropSide === side, 'Insertion marker missing');
-    check(win.getComputedStyle(anchor, '::after').width === '2px', 'Insertion marker lost its geometry');
+    check(!marker().hidden, 'Insertion marker missing');
+    check(marker().getBoundingClientRect().width === 2, 'Insertion marker lost its geometry');
     event(rail(), 'drop', transfer, x); end(source, transfer);
   };
   const restore = async () => {
@@ -46,6 +48,34 @@ module.exports = async app => {
   };
   check(original.length >= 3, 'Prepare at least three subvaults in Debug-Vault');
   try {
+    await run('insertion markers stay centered in every gap, including the dragged button and rail ends', async () => {
+      const strip = rail().parentElement, previousWidth = strip.style.width, previousGap = rail().style.columnGap, previousStripGap = strip.style.columnGap;
+      try {
+        strip.style.width = '320px'; rail().scrollLeft = 0;
+        for (const gap of [4, 10]) {
+          rail().style.columnGap = `${gap}px`;
+          strip.style.columnGap = `${gap}px`;
+          const items = buttons(), bounds = items.map(button => button.getBoundingClientRect());
+          const expected = [bounds[0].left - gap / 2, ...bounds.slice(1).map((r, i) => (bounds[i].right + r.left) / 2), bounds.at(-1).right + gap / 2];
+          for (const source of items) {
+            const transfer = begin(source);
+            for (const x of expected) {
+              event(rail(), 'dragover', transfer, x);
+              check(!marker().hidden && Math.abs(markerCenter() - x) < 0.1, `Marker is off-center at ${x}, gap ${gap}`);
+              check(Math.abs(marker().getBoundingClientRect().top - bounds[0].top - 3) < 0.1, 'Marker is vertically displaced');
+            }
+            end(source, transfer);
+          }
+        }
+        const source = buttons()[1], before = order();
+        await drop(source, source, 'before');
+        check(equal(order(), before), 'Dropping at the original position changed order');
+      } finally {
+        strip.style.width = previousWidth;
+        rail().style.columnGap = previousGap;
+        strip.style.columnGap = previousStripGap;
+      }
+    });
     await run('backward and forward drop preserve selection, DOM identity, focus and file tree', async () => {
       const initialButtons = buttons(), source = initialButtons.at(-1), first = initialButtons[0];
       const header = view.containerEl.querySelector('.sv-header');
@@ -67,7 +97,7 @@ module.exports = async app => {
       const before = order(), source = buttons()[0], transfer = begin(source);
       event(rail(), 'dragover', transfer, rail().getBoundingClientRect().right - 1);
       event(rail(), 'dragleave', transfer, 0);
-      check(!rail().querySelector('[data-drop-side]'), 'Marker survived leaving the rail');
+      check(marker().hidden, 'Marker survived leaving the rail');
       end(source, transfer);
       check(!rail().querySelector('.sv-dragging') && equal(order(), before), 'Cancelled drag changed order or kept styling');
     });
@@ -120,11 +150,12 @@ module.exports = async app => {
         const source = buttons()[0], transfer = begin(source), r = rail().getBoundingClientRect();
         event(rail(), 'dragover', transfer, r.right - 1);
         await waitFor(() => rail().scrollLeft >= rail().scrollWidth - rail().clientWidth - 1);
-        check(buttons().at(-1).dataset.dropSide === 'after', 'Hidden last target is inaccessible');
+        const last = buttons().at(-1).getBoundingClientRect();
+        check(!marker().hidden && markerCenter() > last.right, 'Hidden last target is inaccessible');
         const reached = rail().scrollLeft;
         end(source, transfer);
         await new Promise(resolve => win.setTimeout(resolve, 60));
-        check(rail().scrollLeft === reached && !rail().querySelector('[data-drop-side]'), 'Edge scrolling continued after cancellation');
+        check(rail().scrollLeft === reached && marker().hidden, 'Edge scrolling continued after cancellation');
         rail().scrollLeft = rail().scrollWidth;
         const backwards = begin(buttons().at(-1));
         event(rail(), 'dragover', backwards, r.left + 1);

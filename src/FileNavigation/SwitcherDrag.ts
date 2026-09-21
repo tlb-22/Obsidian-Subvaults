@@ -8,18 +8,24 @@ interface DropTarget { readonly button: HTMLButtonElement; readonly position: Su
 
 export class SwitcherDrag {
   private readonly win: Window;
+  private readonly marker: HTMLElement;
   private source: DragSource | null = null;
-  private target: DropTarget | null = null;
   private pointerX: number | null = null;
   private frame: number | null = null;
   constructor(private readonly rail: HTMLElement, private readonly move: (id: SubvaultId, position: SubvaultPosition) => void) {
     this.win = rail.ownerDocument.defaultView!;
+    this.marker = rail.ownerDocument.createElement('div');
+    this.marker.className = 'sv-drop-marker';
+    this.marker.hidden = true;
+    this.marker.setAttribute('aria-hidden', 'true');
+    rail.insertAdjacentElement('afterend', this.marker);
     rail.addEventListener('dragstart', this.start);
     rail.addEventListener('dragover', this.over);
     rail.addEventListener('dragleave', this.leave);
     rail.addEventListener('drop', this.drop);
     rail.addEventListener('dragend', this.end);
     rail.addEventListener('pointerover', this.suppressTooltip);
+    rail.addEventListener('scroll', this.preview);
   }
   private readonly start = (event: DragEvent): void => {
     const button = (event.target as Element).closest<HTMLButtonElement>('button[data-subvault-id]');
@@ -37,16 +43,29 @@ export class SwitcherDrag {
     if (this.source) event.stopPropagation();
   };
   private locate(x: number): DropTarget | null {
-    const candidates = [...this.rail.querySelectorAll<HTMLButtonElement>('button[data-subvault-id]')].filter(button => button !== this.source?.button);
+    const candidates = [...this.rail.querySelectorAll<HTMLButtonElement>('button[data-subvault-id]')];
     const before = candidates.find(button => { const r = button.getBoundingClientRect(); return x < r.left + r.width / 2; });
     const button = before ?? candidates.at(-1);
     return button ? { button, position: { anchor: subvaultId(button.dataset.subvaultId!), side: before ? 'before' : 'after' } } : null;
   }
-  private preview(): void {
-    this.target?.button.removeAttribute('data-drop-side');
-    this.target = this.pointerX === null ? null : this.locate(this.pointerX);
-    if (this.target) this.target.button.dataset.dropSide = this.target.position.side;
-  }
+  private readonly preview = (): void => {
+    const target = this.pointerX === null ? null : this.locate(this.pointerX);
+    this.marker.hidden = target === null;
+    if (!target) return;
+    const { button, position } = target, before = position.side === 'before';
+    const rect = button.getBoundingClientRect();
+    const neighbor = before ? button.previousElementSibling : button.nextElementSibling;
+    const gap = parseFloat(this.win.getComputedStyle(this.rail).columnGap);
+    const x = neighbor
+      ? before ? (neighbor.getBoundingClientRect().right + rect.left) / 2 : (rect.right + neighbor.getBoundingClientRect().left) / 2
+      : before ? rect.left - gap / 2 : rect.right + gap / 2;
+    const strip = this.rail.parentElement!, origin = strip.getBoundingClientRect();
+    const viewport = this.rail.getBoundingClientRect(), edge = parseFloat(this.win.getComputedStyle(strip).columnGap) / 2;
+    const visibleX = Math.max(viewport.left - edge, Math.min(viewport.right + edge, x));
+    this.marker.style.left = `${visibleX - origin.left - strip.clientLeft}px`;
+    this.marker.style.top = `${rect.top + 3 - origin.top - strip.clientTop}px`;
+    this.marker.style.height = `${rect.height - 6}px`;
+  };
   private readonly over = (event: DragEvent): void => {
     if (!this.source) return;
     event.preventDefault(); event.stopPropagation();
@@ -101,5 +120,7 @@ export class SwitcherDrag {
     this.rail.removeEventListener('drop', this.drop);
     this.rail.removeEventListener('dragend', this.end);
     this.rail.removeEventListener('pointerover', this.suppressTooltip);
+    this.rail.removeEventListener('scroll', this.preview);
+    this.marker.remove();
   }
 }
