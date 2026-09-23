@@ -68,14 +68,13 @@ class ExplorerPane {
 }
 export class ExplorerCoordinator {
   private readonly panes = new Map<WorkspaceLeaf, ExplorerPane>();
-  private readonly unsupported = new WeakSet<WorkspaceLeaf>();
   constructor(private readonly app: App, private readonly catalog: SubvaultCatalog, private readonly navigation: NavigationSession, private readonly report: (error: unknown) => void) {}
   update(): void {
-    const leaves = new Set(this.app.workspace.getLeavesOfType('file-explorer'));
+    // Background leaves may still hold a DeferredView; layout-change runs again after native loading.
+    const leaves = new Set(this.app.workspace.getLeavesOfType('file-explorer').filter(leaf => !leaf.isDeferred));
     for (const [leaf, pane] of this.panes) if (!leaves.has(leaf)) { pane.dispose(); this.panes.delete(leaf); }
-    for (const leaf of leaves) if (!this.panes.has(leaf) && !this.unsupported.has(leaf)) {
-      try { this.panes.set(leaf, new ExplorerPane(this.app, leaf, this.catalog, this.navigation, this.report)); }
-      catch (error) { this.unsupported.add(leaf); this.report(error); }
+    for (const leaf of leaves) if (!this.panes.has(leaf)) {
+      this.panes.set(leaf, new ExplorerPane(this.app, leaf, this.catalog, this.navigation, this.report));
     }
     const paths: string[] = [];
     this.app.workspace.iterateAllLeaves(leaf => {

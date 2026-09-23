@@ -9,7 +9,7 @@
 | 插件入口 | `Plugin.loadData()`、`saveData(document)` | 恢复数据或异步保存结果；具体语义见[数据与提交](PluginData.md) |
 | 会话装配 | `Workspace.onLayoutReady`、`Component.registerEvent` / `register` | 布局就绪与组件清理点 |
 | 文件夹管理 | `Vault.getFolderByPath`、`getAllFolders`，`create` / `rename` / `delete` 事件 | 文件夹存在性、选择候选及真实路径变化 |
-| 导航协调 | `getLeavesOfType`、`iterateAllLeaves`、`FileView.file`、`WorkspaceLeaf.getViewState` | 文件导航实例与已加载、延迟加载标签页的文件路径 |
+| 导航协调 | `getLeavesOfType`、`WorkspaceLeaf.isDeferred`、`iterateAllLeaves`、`FileView.file`、`WorkspaceLeaf.getViewState` | 文件导航实例、原生加载状态与工作区标签页的文件路径 |
 | 呈现 | `Menu`、`ButtonComponent`、`SearchComponent`、`setIcon`、`setTooltip`、`Notice` | 原生菜单、控件、图标、提示和操作反馈 |
 
 公开接口依据：[官方类型定义仓库](https://github.com/obsidianmd/obsidian-api)、[插件开发文档](https://docs.obsidian.md/)。
@@ -33,7 +33,7 @@ Obsidian 1.13.7 的本地源码观察确认：原生提示在带 `aria-label` �
 | `onFilePointerover(event, title)` | 原生文件信息提示与 `hover-link` 事件 | 外部文件使用完整路径的公开 tooltip，同时继续发送文件悬停预览事件 |
 | 文件夹条目的原生 drop 监听 | 读取宿主拖动上下文、检查目标并执行文件操作 | 空白处拖放转交当前工作文件夹的原生条目 |
 
-适配器在接入时检查所需方法和结构。卸载时仅恢复自己仍拥有的方法覆盖；若后续插件包装了本插件的函数，本插件的包装停止应用视图逻辑。
+Coordinator 使用公开的 `WorkspaceLeaf.isDeferred` 区分后台占位视图与已加载的文件导航，仅为已加载视图创建适配器。宿主完成延迟加载后发出的 `layout-change` 驱动接入；后台视图保持原生加载时机。`ExplorerView` 集中描述已加载文件导航的内部接口契约。卸载时仅恢复自己仍拥有的方法覆盖；若后续插件包装了本插件的函数，本插件的包装停止应用视图逻辑。
 
 ## 适用边界
 

@@ -12,6 +12,7 @@
 | `npm run package:release -- 0.1.1` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
+| `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
 
 [领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索、前后排序与失效身份和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入、排序与创建移除的串行协作及导航恢复。
 
@@ -60,6 +61,10 @@
 在 Debug-Vault 中先打开 `Outside.md`，再从开发控制台调用[验收脚本](../../tests/obsidian/verify-appearance.cjs)。第二个参数接收 `{ name, css }` 主题数组；空数组检查默认主题。主题文件保存在 `.artifacts` 的调查目录，脚本结束后恢复原来的深浅模式与视图选择。该验证覆盖直接加载主题 CSS 的情况，主题配套插件与额外样式设置需独立验证。界面样式契约见[界面与主题](InterfaceAppearance.md)。
 
 ## 功能与交互实机证据
+
+2026-09-23，同步构建后在 Obsidian 1.13.7 的 Debug-Vault 执行[延迟加载验收](../../tests/obsidian/verify-deferred.cjs)，4 项通过。脚本以宿主保存的视图状态创建真实后台 `DeferredView`：后台启动及两次重载保持占位视图和已有配置、无错误通知；原生显示后自动接入且重复布局事件保持单份控件；加载前卸载不会遗留接入，重新启用可接入已加载视图。报告为 `.artifacts/scratch/tests/20260923-133926-884-deferred-verification-33182/results.json`。随后核心宿主验收 10 项全部通过，报告为 `.artifacts/scratch/tests/20260923-133950-478-host-verification-33182/results.json`；类型检查与 18 项 Node 测试通过。
+
+同日，在报告问题的 Default vault 更新并重新启用修复构建：文件导航原本处于 `isDeferred === true` 的后台状态，重载保持原生占位视图且无新增错误；显示导航后自动接入，标题与切换条各一份。3 个已有 subvault、当前选择、编辑器标签页与当前笔记保持不变；安装时 `data.json` 逐字节不变。验证报告为 `.artifacts/scratch/probes/20260923-134048-252-default-deferred-fix-33276/results.json`，原安装文件与配置备份于同名 `backups/` 目录。
 
 2026-09-21，同步构建并重新加载 Debug-Vault 后，通过[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs)派发 DOM 拖放事件。默认主题、Catppuccin 0.4.49 和 Minimal 9.0.2 的深浅模式均通过 8 项检查：各插入位置对齐；前后移动保持按钮与文件树节点、焦点和选择；取消清理；原生悬停提示关闭与恢复；固定入口与外部拖放边界；窄侧栏双向边缘滚动；保存失败保留顺序并报错；重载恢复顺序。汇总报告为 `.artifacts/scratch/probes/20260921-080533-069-insertion-theme-review-36578/results.json`，各次运行结束后恢复原顺序、主题和深浅模式。该检查覆盖宿主事件与存储协作；系统鼠标拖动尚未完成端到端验证。
 

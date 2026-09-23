@@ -17,14 +17,6 @@ interface ExplorerView extends View {
   createAbstractFile(kind: 'file' | 'folder', parent: TFolder | null, leaf: boolean | 'tab' | 'split' | 'window'): Promise<void>;
 }
 export type ExplorerScope = { readonly kind: 'all' } | { readonly kind: 'folder'; readonly root: FolderPath; readonly external: readonly string[] };
-function inspect(view: View): ExplorerView {
-  const candidate = view as Partial<ExplorerView>;
-  if (typeof candidate.getSortedFolderItems !== 'function' || typeof candidate.sort !== 'function' || typeof candidate.createAbstractFile !== 'function' || typeof candidate.onFileContextMenu !== 'function' || typeof candidate.onFilePointerover !== 'function' || typeof candidate.revealActiveFile !== 'function' || typeof candidate.revealInFolder !== 'function' || !candidate.navFileContainerEl || !candidate.fileItems || !candidate.tree?.infinityScroll) {
-    throw new Error('This Obsidian file explorer is not supported. Subvaults requires the desktop 1.13 file explorer.');
-  }
-  return candidate as ExplorerView;
-}
-
 export class NativeExplorer {
   readonly view: ExplorerView;
   private scope: ExplorerScope = { kind: 'all' };
@@ -36,11 +28,10 @@ export class NativeExplorer {
   private readonly originalLabels = new Map<HTMLElement, string | null>();
   private contextMenu: Menu | null = null;
   constructor(private readonly app: App, readonly leaf: WorkspaceLeaf, private readonly report: (error: unknown) => void) {
-    this.view = inspect(leaf.view);
+    this.view = leaf.view as ExplorerView;
     const v = this.view;
     const buttons = v.containerEl.querySelectorAll<HTMLElement>('.nav-header .nav-action-button');
-    const newNote = buttons[0], newFolder = buttons[1];
-    if (!newNote || !newFolder) throw new Error('The native file creation controls are unavailable.');
+    const newNote = buttons[0]!, newFolder = buttons[1]!;
     this.wrap('getSortedFolderItems', original => folder => {
       if (this.scope.kind === 'all') return original(folder);
       if (folder.isRoot()) {
