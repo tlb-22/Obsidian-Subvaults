@@ -25,9 +25,9 @@ Subvaults 让你在 Obsidian 中将不同文件夹作为独立空间浏览，同
     <th width="33.33%">新建 subvault</th>
   </tr>
   <tr>
-    <td><img src=".docs/images/all-v0.1.1-zh-Hans.png" width="240" alt="All：在同一 vault 中组织学习、研究与娱乐"></td>
-    <td><img src=".docs/images/subvault-v0.1.1-zh-Hans.png" width="240" alt="Research subvault：聚焦研究文件夹，并保留已打开的学习笔记"></td>
-    <td><img src=".docs/images/create-v0.1.1-zh-Hans.png" width="240" alt="为 Leisure 文件夹创建 subvault，使用橙色游戏手柄图标"></td>
+    <td><img src=".docs/images/all-v0.1.2-zh-Hans.png" width="240" alt="All：在同一 vault 中组织学习、研究与娱乐"></td>
+    <td><img src=".docs/images/subvault-v0.1.2-zh-Hans.png" width="240" alt="Research subvault：聚焦研究文件夹，并保留已打开的学习笔记"></td>
+    <td><img src=".docs/images/create-v0.1.2-zh-Hans.png" width="240" alt="为 Leisure 文件夹创建 subvault，使用橙色游戏手柄图标"></td>
   </tr>
 </table>
 
