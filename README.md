@@ -50,11 +50,11 @@ Requires Obsidian desktop 1.13.7 or later. The plugin interface is currently in 
 
 ## Building from Source
 
-Requires Node.js 22 or later. From the project directory:
+Requires Node.js 24 or later and [pnpm](https://pnpm.io/installation), using the version pinned in `package.json`. From the project directory:
 
 ```sh
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 ```
 
 The plugin files are generated in `dist/`. See [project specifications](spec/Main.md) for development and verification details.

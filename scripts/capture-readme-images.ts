@@ -12,7 +12,7 @@ import type { CaptureRecord, ImageRecord } from './screenshots/ImageRules';
 import type { Observation, SceneRequest } from './screenshots/HostScene';
 
 async function capture(): Promise<void> {
-  if (process.argv.length !== 2) throw new Error('Usage: npm run screenshots');
+  if (process.argv.length !== 2) throw new Error('Usage: pnpm run screenshots');
   const locks = join(paths.scratch, 'probes');
   await mkdir(locks, { recursive: true });
   const lockPath = join(locks, 'readme-capture.lock');
@@ -20,7 +20,7 @@ async function capture(): Promise<void> {
   try {
     const manifest = JSON.parse(await readFile(join(paths.dist, 'manifest.json'), 'utf8')) as CaptureManifest;
     if (!/^\d+\.\d+\.\d+$/.test(manifest.version)) throw new Error('Screenshot filenames require a three-part plugin version');
-    if (await readFile(join(paths.dist, 'manifest.json'), 'utf8') !== await readFile(join(paths.project, 'manifest.json'), 'utf8')) throw new Error('Build manifest differs from the project. Run npm run screenshots.');
+    if (await readFile(join(paths.dist, 'manifest.json'), 'utf8') !== await readFile(join(paths.project, 'manifest.json'), 'utf8')) throw new Error('Build manifest differs from the project. Run pnpm run screenshots.');
     const source = await sourceDigest(paths.project);
     const { name, directories } = createArtifactRun('readme-capture', ['tests', 'logs', 'previews']);
     console.log(`Screenshot run: ${name}`);

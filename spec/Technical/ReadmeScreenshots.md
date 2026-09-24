@@ -4,11 +4,11 @@
 
 ## 运行
 
-在已安装 Obsidian 的 macOS 上，使用 Node.js 22 或更新版本：
+在已安装 Obsidian 的 macOS 上，使用 Node.js 24 或更新版本和 `package.json` 固定版本的 pnpm：
 
 ```sh
-npm ci
-npm run screenshots
+pnpm install --frozen-lockfile
+pnpm run screenshots
 ```
 
 命令构建插件、重建 `TestVaults/Debug-Screenshot-Vault/`、依次启动两个语言实例，并生成 `.docs/images/` 中的六张图片。全部场景通过检查后更新 README 引用，删除本工具管理的旧版本图片。运行期间会显示截图窗口，应让脚本自行完成场景切换。
@@ -32,7 +32,7 @@ npm run screenshots
 ## 过期检查
 
 ```sh
-npm run screenshots:check
+pnpm run screenshots:check
 ```
 
 该命令无需启动 Obsidian，可直接用于 GitHub Actions。它根据 `manifest.json` 的版本检查六张图片是否存在，以及两个 README 是否引用各自语言的当前版本图片。它只读取仓库文件，清理本地产物后仍可执行。

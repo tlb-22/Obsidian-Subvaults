@@ -50,11 +50,11 @@ Subvaults 让你在 Obsidian 中将不同文件夹作为独立空间浏览，同
 
 ## 源码构建
 
-需要 Node.js 22 或更高版本。在项目目录执行：
+需要 Node.js 24 或更高版本，以及 `package.json` 固定版本的 [pnpm](https://pnpm.io/installation)。在项目目录执行：
 
 ```sh
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 ```
 
 插件文件生成在 `dist/` 中。开发与验证的详细说明见[项目规格](spec/Main.md)。

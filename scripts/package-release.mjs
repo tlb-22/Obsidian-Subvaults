@@ -6,12 +6,12 @@ import paths from './project-paths.cjs';
 
 async function packageRelease() {
   const tag = process.argv[2];
-  if (process.argv.length !== 3 || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(tag)) throw new Error('Usage: npm run package:release -- <x.y.z>');
+  if (process.argv.length !== 3 || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(tag)) throw new Error('Usage: pnpm run package:release <x.y.z>');
   const manifestText = await readFile(join(paths.project, 'manifest.json'), 'utf8');
   const manifest = JSON.parse(manifestText);
   const metadata = JSON.parse(await readFile(join(paths.project, 'package.json'), 'utf8'));
   if (tag !== manifest.version || tag !== metadata.version) throw new Error('Release tag, manifest.json and package.json versions must match');
-  if (await readFile(join(paths.dist, 'manifest.json'), 'utf8') !== manifestText) throw new Error('Build manifest differs from the project. Run npm run build.');
+  if (await readFile(join(paths.dist, 'manifest.json'), 'utf8') !== manifestText) throw new Error('Build manifest differs from the project. Run pnpm run build.');
 
   const releases = join(paths.artifacts, 'releases');
   await mkdir(releases, { recursive: true });

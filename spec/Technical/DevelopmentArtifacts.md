@@ -1,6 +1,6 @@
 # 开发产物
 
-项目路径统一由 [project-paths.cjs](../../scripts/project-paths.cjs) 从模块位置推导。`dist/` 保存编译输出，`TestVaults/` 保存 Obsidian 测试 vault，`.docs/images/` 保存随仓库提交的 README 图片。可清理的运行产物按以下用途组织：
+项目路径统一由 [project-paths.cjs](../../scripts/project-paths.cjs) 从模块位置推导。`dist/` 保存编译输出，`TestVaults/` 保存 Obsidian 测试 vault，`.docs/images/` 保存随仓库提交的 README 图片。`.artifacts/` 仅设 `releases/` 和 `scratch/` 两个一级目录，分别保存版本发布文件与临时运行产物：
 
 | 目录 | 内容 | 生命周期 |
 | --- | --- | --- |
@@ -8,8 +8,6 @@
 | `.artifacts/scratch/tests/<run>/` | 测试报告、截图实例的独立应用配置 | 单次运行 |
 | `.artifacts/scratch/probes/<run>/` | 调查脚本、接口探测与专项检查证据 | 单次调查 |
 | `.artifacts/scratch/previews/<run>/` | 原始截图与场景记录 | 单次运行 |
-| `.artifacts/cache/` | npm 等工具可复用的缓存 | 跨运行复用，可重建 |
-| `.artifacts/backups/<run>/` | 配置或标识调整前的备份 | 单独决定保留期限 |
 | `.artifacts/releases/<version>/` | 三个安装文件及版本化 ZIP | 按发布版本保存 |
 
 `<run>` 使用 `YYYYMMDD-HHMMSS-SSS-<purpose>-<pid>`，时间为 UTC，`SSS` 为毫秒。时间顺序便于查找，用途说明任务，进程号区分并发调用。例如 `20260919-150000-123-readme-capture-12345`。同次任务的日志、配置和图片使用相同运行名，分类目录按实际需要创建。
@@ -32,6 +30,8 @@
 
 ## 维护
 
-没有相关任务运行时，可以删除整个 `.artifacts/scratch/`。它不承担配置存储或源码职责；可重复执行的逻辑放在 `scripts/`、`tests/`，有长期价值的结论写入 `spec/`。缓存与备份独立于 scratch，便于分别清理。上述目录均由 Git 忽略。
+项目历史由 Git 管理，依赖缓存使用包管理器的共享存储。仅在修改 Git 未覆盖且无法重建的用户数据时，按需将临时回退副本放入对应任务的 `scratch/probes/<run>/before/`。
+
+任务结束后，将必要的验证结论记录到 `spec/`，再清理其 scratch 产物；临时回退副本在操作验证完成后清理。没有相关任务运行或待验收数据时，可以删除整个 `scratch/`。可重复执行的逻辑放在 `scripts/`、`tests/`；`releases/` 按版本保留。`.artifacts/` 由 Git 忽略。
 
 [README 截图](ReadmeScreenshots.md) 将原始图片、场景记录、进程配置和日志写入同名分类目录；完整检查后的图片才发布至 `.docs/images/`。宿主验收每次创建独立的 `host-verification` 或 `interaction-verification` 运行目录，将 `results.json` 随检查进度写入并在控制台输出位置。专项验证证据及其实际覆盖范围见[验证记录](Verification.md)。

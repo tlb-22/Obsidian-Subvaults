@@ -4,12 +4,12 @@
 
 | 命令 | 验证范围 | 当前结果 |
 | --- | --- | --- |
-| `npm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
-| `npm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
-| `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
-| `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.3 沿用原图 |
-| `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
-| `npm run package:release -- 0.1.3` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `pnpm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
+| `pnpm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
+| `pnpm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
+| `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.3 沿用原图 |
+| `pnpm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
+| `pnpm run package:release 0.1.3` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
@@ -23,7 +23,9 @@
 
 [截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260921-082649-537-readme-capture-38153/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
 
-0.1.3 本地发布准备通过 21 项测试、类型检查和截图引用检查。六张截图重命名并更新 README 引用，逐字节确认画面内容不变；发布目录 `.artifacts/releases/0.1.3/`、ZIP、Debug-Vault 和 Default 的三个安装文件均与构建一致，Default 的 `data.json` 保持不变。安装前备份位于 `.artifacts/backups/20260924-031303-621-release-0-1-3-45860/`。宿主重载与最终实机回归仍待完成；本版本尚未推送。
+2026-09-24，在 Node.js 24.21.0 / pnpm 12.6.0 下完成冻结锁文件的全新安装，21 项测试、类型检查、构建、Debug-Vault 同步、截图引用与源码摘要读取均通过。依赖的 70 个包版本与迁移前一致，三个安装文件逐字节一致；临时项目通过 `pnpm run package:release 0.1.3` 打包并核对 ZIP。记录位于 `.artifacts/scratch/tests/20260924-082033-585-pnpm-migration-69879/results.json`。本次未运行远程 CI、重新捕获截图或重载宿主。
+
+0.1.3 本地发布准备通过 21 项测试、类型检查和截图引用检查。六张截图重命名并更新 README 引用，逐字节确认画面内容不变；发布目录 `.artifacts/releases/0.1.3/`、ZIP、Debug-Vault 和 Default 的三个安装文件均与构建一致，Default 的 `data.json` 保持不变。安装前备份位于 `.artifacts/scratch/probes/20260924-031303-621-release-0-1-3-45860/before/`。宿主重载与最终实机回归仍待完成；本版本尚未推送。
 
 0.1.2 本地发布准备已通过全部 18 项测试、类型检查和截图引用检查。`.artifacts/releases/0.1.2/` 的三个安装文件、ZIP 内文件及 Debug-Vault 安装文件与构建输出逐字节一致；ZIP 根目录恰含三个安装文件。六张截图沿用 0.1.1 的已验证画面，仅重命名为 0.1.2 并更新两份 README 引用，SHA-256 确认图片内容不变。Debug-Vault 已重载并确认运行 0.1.2，标题与切换条各一份，配置和选择保持不变。核对记录保存于 `.artifacts/scratch/probes/20260923-134551-438-release-0-1-2-33614/`；延迟加载修复的实机验收见下文。本版本的远程 CI 与发布尚未执行。
 
@@ -51,7 +53,7 @@
 
 [开发路径](../../scripts/project-paths.cjs) 从模块位置推导项目根目录，供构建、同步、样本准备及宿主验收共用。[宿主入口检查](../../tests/obsidian/debug-vault.cjs) 使用 `FileSystemAdapter.getBasePath()` 和真实目录路径，确保验收只操作该项目的 `TestVaults/Debug-Vault`。项目可以整体移动或重命名；内部测试目录结构保持约定，构建脚本可从其他工作目录调用。
 
-`npm run dev` 监听 TypeScript 源码，将开发构建写入 `dist/`；启动构建时同时复制 `src/styles.css` 和 manifest。修改 CSS 后运行 `npm run sync:debug` 并重新加载插件以检查效果。同步目录由构建 manifest 的插件 ID 决定。`TestVaults/`、`dist/` 和 `.artifacts/` 均为本地开发目录，由 Git 忽略。
+`pnpm run dev` 监听 TypeScript 源码，将开发构建写入 `dist/`；启动构建时同时复制 `src/styles.css` 和 manifest。修改 CSS 后运行 `pnpm run sync:debug` 并重新加载插件以检查效果。同步目录由构建 manifest 的插件 ID 决定。`TestVaults/`、`dist/` 和 `.artifacts/` 均为本地开发目录，由 Git 忽略。
 
 ## 主题实机验证
 
@@ -67,11 +69,11 @@
 
 ## 功能与交互实机证据
 
-2026-09-24，在 Default vault 观察到主区域只有空标签页，而延迟的反向链接、出链和大纲视图仍保存两个文件路径。Obsidian 1.13.7 源码进一步确认这些辅助视图加载后继承 `FileView`，但 `navigation` 为 false。当前适配按已加载文件视图的导航标志及延迟视图的扩展名注册关系读取打开文件。最终构建通过类型检查与 21 项 Node 测试，已同步 Debug-Vault 并安装到 Default，安装时保留 `data.json`；备份位于 `.artifacts/backups/20260924-022525-651-default-open-files-fix-41248/`。最终构建的宿主回归与 Default 重载确认仍待完成。
+2026-09-24，在 Default vault 观察到主区域只有空标签页，而延迟的反向链接、出链和大纲视图仍保存两个文件路径。Obsidian 1.13.7 源码进一步确认这些辅助视图加载后继承 `FileView`，但 `navigation` 为 false。当前适配按已加载文件视图的导航标志及延迟视图的扩展名注册关系读取打开文件。最终构建通过类型检查与 21 项 Node 测试，已同步 Debug-Vault 并安装到 Default，安装时保留 `data.json`；备份位于 `.artifacts/scratch/probes/20260924-022525-651-default-open-files-fix-41248/before/`。最终构建的宿主回归与 Default 重载确认仍待完成。
 
 2026-09-23，同步构建后在 Obsidian 1.13.7 的 Debug-Vault 执行[延迟加载验收](../../tests/obsidian/verify-deferred.cjs)，4 项通过。脚本以宿主保存的视图状态创建真实后台 `DeferredView`：后台启动及两次重载保持占位视图和已有配置、无错误通知；原生显示后自动接入且重复布局事件保持单份控件；加载前卸载不会遗留接入，重新启用可接入已加载视图。报告为 `.artifacts/scratch/tests/20260923-133926-884-deferred-verification-33182/results.json`。随后核心宿主验收 10 项全部通过，报告为 `.artifacts/scratch/tests/20260923-133950-478-host-verification-33182/results.json`；类型检查与 18 项 Node 测试通过。
 
-同日，在报告问题的 Default vault 更新并重新启用修复构建：文件导航原本处于 `isDeferred === true` 的后台状态，重载保持原生占位视图且无新增错误；显示导航后自动接入，标题与切换条各一份。3 个已有 subvault、当前选择、编辑器标签页与当前笔记保持不变；安装时 `data.json` 逐字节不变。验证报告为 `.artifacts/scratch/probes/20260923-134048-252-default-deferred-fix-33276/results.json`，原安装文件与配置备份于同名 `backups/` 目录。
+同日，在报告问题的 Default vault 更新并重新启用修复构建：文件导航原本处于 `isDeferred === true` 的后台状态，重载保持原生占位视图且无新增错误；显示导航后自动接入，标题与切换条各一份。3 个已有 subvault、当前选择、编辑器标签页与当前笔记保持不变；安装时 `data.json` 逐字节不变。验证报告为 `.artifacts/scratch/probes/20260923-134048-252-default-deferred-fix-33276/results.json`，原安装文件与配置副本保存在该目录的 `before/` 下。
 
 2026-09-21，同步构建并重新加载 Debug-Vault 后，通过[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs)派发 DOM 拖放事件。默认主题、Catppuccin 0.4.49 和 Minimal 9.0.2 的深浅模式均通过 8 项检查：各插入位置对齐；前后移动保持按钮与文件树节点、焦点和选择；取消清理；原生悬停提示关闭与恢复；固定入口与外部拖放边界；窄侧栏双向边缘滚动；保存失败保留顺序并报错；重载恢复顺序。汇总报告为 `.artifacts/scratch/probes/20260921-080533-069-insertion-theme-review-36578/results.json`，各次运行结束后恢复原顺序、主题和深浅模式。该检查覆盖宿主事件与存储协作；系统鼠标拖动尚未完成端到端验证。
 

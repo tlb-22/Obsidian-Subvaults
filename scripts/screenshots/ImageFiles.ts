@@ -7,7 +7,7 @@ import { captureIssues, imageIssues, readmeReferences, updateReadme, type Captur
 
 export function digest(bytes: Uint8Array | string): string { return createHash('sha256').update(bytes).digest('hex'); }
 export async function sourceDigest(project: string): Promise<string> {
-  const files = ['manifest.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'scripts/build.mjs', 'scripts/project-paths.cjs', 'scripts/artifact-run.cjs', 'scripts/capture-readme-images.ts', 'scripts/check-readme-images.ts'];
+  const files = ['manifest.json', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig.json', 'scripts/build.mjs', 'scripts/project-paths.cjs', 'scripts/artifact-run.cjs', 'scripts/capture-readme-images.ts', 'scripts/check-readme-images.ts'];
   const collect = async (directory: string): Promise<void> => {
     for (const entry of await readdir(join(project, directory), { withFileTypes: true })) {
       const name = `${directory}/${entry.name}`;
@@ -35,11 +35,11 @@ export async function imageFacts(directory: string, version: string): Promise<re
 export async function checkReadmeImages(project: string, directory: string): Promise<string> {
   const { version } = JSON.parse(await readFile(join(project, 'manifest.json'), 'utf8')) as { version: string };
   const issues = imageIssues(version, await imageFacts(directory, version));
-  if (issues.length) throw new Error(`README screenshots are stale or invalid: ${JSON.stringify(issues)}. Run npm run screenshots.`);
+  if (issues.length) throw new Error(`README screenshots are stale or invalid: ${JSON.stringify(issues)}. Run pnpm run screenshots.`);
   for (const language of languages) {
     const references = readmeReferences(await readFile(join(project, language.readme), 'utf8'));
     const expected = scenes.map(scene => `.docs/images/${imageName(scene, version, language.id)}`);
-    if (JSON.stringify(references) !== JSON.stringify(expected)) throw new Error(`${language.readme} must reference exactly the current ${language.id} screenshots. Run npm run screenshots.`);
+    if (JSON.stringify(references) !== JSON.stringify(expected)) throw new Error(`${language.readme} must reference exactly the current ${language.id} screenshots. Run pnpm run screenshots.`);
   }
   return version;
 }
