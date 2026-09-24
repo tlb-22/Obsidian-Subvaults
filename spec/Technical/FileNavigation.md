@@ -6,6 +6,8 @@
 
 Coordinator 为已加载的文件导航创建 ExplorerPane，后台延迟视图在宿主加载并发出布局事件后接入。它从当前 subvault 和工作区仍打开的文件生成显示范围。每个 ExplorerPane 保留独立的原生适配器和界面节点，将范围交给原生树适配器，并更新标题及切换条。
 
+[OpenFiles](../../src/FileNavigation/OpenFiles.ts) 每次更新都从工作区读取文件视图：已加载视图读取允许文件导航的 `FileView.file`，延迟视图按宿主文件扩展名注册表确认视图类型后解析文件路径。主区域、浮动窗口与侧栏中的真实文件视图使用同一规则；辅助面板的文件引用不进入打开文件集合。路径交给纯规则去重并按当前绑定判断内外归属，状态所有权见[数据与提交](PluginData.md)。
+
 在 subvault 视图中，原生 vault 根查询返回工作文件夹的原生有序子条目，再追加外部已打开文件的原生条目。内部后代继续使用原生查询，外部祖先不参与该视图的层级。`All` 直接使用原生查询结果。
 
 切换时先记住离开视图的滚动位置，在同一同步更新中修改标题与显示范围，再恢复目标位置。外部文件集合变化只更新必要的树投影；标题和切换条按稳定身份更新，现存节点继续使用。
@@ -17,6 +19,7 @@ Coordinator 为已加载的文件导航创建 ExplorerPane，后台延迟视图�
 | 选择与外部文件规则 | 视图身份与打开文件事实 → 外部文件路径集合 | [NavigationState](../../src/FileNavigation/NavigationState.ts) |
 | 导航会话 | 当前选择、滚动记录与清单变化 → 视图通知及恢复数据 | [NavigationSession](../../src/FileNavigation/NavigationSession.ts) |
 | 实例协调 | 宿主布局与会话 → 每个文件导航的显示范围和生命周期 | [ExplorerCoordinator](../../src/FileNavigation/ExplorerCoordinator.ts) |
+| 工作区文件读取 | 宿主文件视图与注册表 → 当前打开的真实文件路径 | [OpenFiles](../../src/FileNavigation/OpenFiles.ts) |
 | 原生接入 | 显示范围 → 原生条目投影、定位、导航内新建和样式标记 | [NativeExplorer](../../src/FileNavigation/NativeExplorer.ts) |
 | 导航呈现 | 清单与选择 → 固定标题、切换条、管理入口 | [ExplorerChrome](../../src/FileNavigation/ExplorerChrome.ts) |
 | 切换条拖拽 | 原生拖放事件 → 插入提示、边缘滚动及排序意图 | [SwitcherDrag](../../src/FileNavigation/SwitcherDrag.ts) |

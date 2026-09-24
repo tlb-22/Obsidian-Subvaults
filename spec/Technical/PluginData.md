@@ -11,7 +11,7 @@
 | 已成功保存的文档快照及写入队列 | [PluginPersistence](../../src/Persistence/PluginPersistence.ts)，仅用于合并存储片段和确认提交 |
 | 创建草稿、搜索和单选树展开状态 | [CreatePanel](../../src/Subvaults/CreatePanel.ts)，随创建交互存活 |
 | 文件夹名称、路径、内容 | Obsidian vault；名称从绑定路径推导 |
-| 打开的文件、原生排序和原生展开状态 | Obsidian 工作区与文件导航；外部文件列表由这些事实和当前绑定推导 |
+| 打开的文件、原生排序和原生展开状态 | Obsidian 工作区与文件导航；[OpenFiles](../../src/FileNavigation/OpenFiles.ts) 按需读取真实文件视图，外部文件列表由这些事实和当前绑定推导，不写入插件数据 |
 | 原生接入句柄、DOM 节点及事件监听 | 创建它们的适配器或呈现对象，由 [PluginSession](../../src/App/PluginSession.ts) 的组件生命周期协调释放 |
 
 ## 文档格式与保存

@@ -1,5 +1,5 @@
 /** 协调各原生文件导航实例与业务状态，稳定持有界面并管理滚动和事件资源。 */
-import { FileView, type App, type WorkspaceLeaf } from 'obsidian';
+import type { App, WorkspaceLeaf } from 'obsidian';
 import type { SubvaultCatalog } from '../Subvaults/SubvaultCatalog';
 import { CreatePanel } from '../Subvaults/CreatePanel';
 import { SubvaultMenu } from '../Subvaults/SubvaultMenu';
@@ -8,6 +8,7 @@ import { outsideFiles, sameSelection, type Selection } from './NavigationState';
 import type { NavigationSession } from './NavigationSession';
 import { NativeExplorer, type ExplorerScope } from './NativeExplorer';
 import { ExplorerChrome } from './ExplorerChrome';
+import { openFilePaths } from './OpenFiles';
 
 class ExplorerPane {
   private readonly native: NativeExplorer;
@@ -76,11 +77,7 @@ export class ExplorerCoordinator {
     for (const leaf of leaves) if (!this.panes.has(leaf)) {
       this.panes.set(leaf, new ExplorerPane(this.app, leaf, this.catalog, this.navigation, this.report));
     }
-    const paths: string[] = [];
-    this.app.workspace.iterateAllLeaves(leaf => {
-      const path = leaf.view instanceof FileView ? leaf.view.file?.path : leaf.getViewState().state?.file;
-      if (typeof path === 'string' && this.app.vault.getFileByPath(path)) paths.push(path);
-    });
+    const paths = openFilePaths(this.app);
     for (const pane of this.panes.values()) pane.update(paths);
   }
   dispose(): void { for (const pane of this.panes.values()) pane.dispose(); this.panes.clear(); }

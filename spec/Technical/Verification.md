@@ -5,7 +5,7 @@
 | 命令 | 验证范围 | 当前结果 |
 | --- | --- | --- |
 | `npm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
-| `npm test` | 14 项纯规则与应用协作测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
+| `npm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
 | `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.2 沿用原图 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
@@ -13,8 +13,11 @@
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
+| `tests/obsidian/verify-open-files.cjs` | 辅助面板与真实文件标签的区分、延迟标签、重复与关闭、Canvas 和侧栏文件标签 | 最终构建待实机复验 |
 
 [领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索、前后排序与失效身份和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入、排序与创建移除的串行协作及导航恢复。
+
+[工作区文件适配测试](../../tests/open-files.test.ts) 使用宿主边界替身执行实际适配代码，验证已加载和延迟辅助面板的文件引用不构成打开标签，真实文件视图与注册的延迟视图参与列表，以及关闭标签和注册表变化后按当前事实重新计算。该测试不替代真实宿主的接口及事件验证。
 
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
@@ -61,6 +64,8 @@
 在 Debug-Vault 中先打开 `Outside.md`，再从开发控制台调用[验收脚本](../../tests/obsidian/verify-appearance.cjs)。第二个参数接收 `{ name, css }` 主题数组；空数组检查默认主题。主题文件保存在 `.artifacts` 的调查目录，脚本结束后恢复原来的深浅模式与视图选择。该验证覆盖直接加载主题 CSS 的情况，主题配套插件与额外样式设置需独立验证。界面样式契约见[界面与主题](InterfaceAppearance.md)。
 
 ## 功能与交互实机证据
+
+2026-09-24，在 Default vault 观察到主区域只有空标签页，而延迟的反向链接、出链和大纲视图仍保存两个文件路径。Obsidian 1.13.7 源码进一步确认这些辅助视图加载后继承 `FileView`，但 `navigation` 为 false。当前适配按已加载文件视图的导航标志及延迟视图的扩展名注册关系读取打开文件。最终构建通过类型检查与 21 项 Node 测试，已同步 Debug-Vault 并安装到 Default，安装时保留 `data.json`；备份位于 `.artifacts/backups/20260924-022525-651-default-open-files-fix-41248/`。最终构建的宿主回归与 Default 重载确认仍待完成。
 
 2026-09-23，同步构建后在 Obsidian 1.13.7 的 Debug-Vault 执行[延迟加载验收](../../tests/obsidian/verify-deferred.cjs)，4 项通过。脚本以宿主保存的视图状态创建真实后台 `DeferredView`：后台启动及两次重载保持占位视图和已有配置、无错误通知；原生显示后自动接入且重复布局事件保持单份控件；加载前卸载不会遗留接入，重新启用可接入已加载视图。报告为 `.artifacts/scratch/tests/20260923-133926-884-deferred-verification-33182/results.json`。随后核心宿主验收 10 项全部通过，报告为 `.artifacts/scratch/tests/20260923-133950-478-host-verification-33182/results.json`；类型检查与 18 项 Node 测试通过。
 

@@ -16,6 +16,12 @@
 
 Obsidian 1.13.7 的本地源码观察确认：原生提示在带 `aria-label` 的元素上委托处理 `pointerover` / `pointerout`，退出时同时取消显示计时器并移除当前提示。[Controls](../../src/Presentation/Controls.ts) 在切换条拖动开始时发送退出事件，复用这条清理路径；该行为属于宿主实现观察，验证结果见[验证记录](Verification.md)。
 
+## 工作区文件视图
+
+[OpenFiles](../../src/FileNavigation/OpenFiles.ts) 使用 `iterateAllLeaves` 读取各区域的当前视图，已加载视图通过公开的 `FileView`、`navigation` 和 `file` 成员取得允许文件导航的打开文件。对于 `isDeferred` 为真的视图，解析其 `state.file`，再通过内部接口 `app.viewRegistry.getTypeByExtension(file.extension)` 确认保存的视图类型是该文件的注册打开类型。适配器按需读取宿主注册表，不保存扩展名映射或打开文件清单。
+
+Obsidian 1.13.7 本地源码显示，该注册表由宿主和插件的扩展名注册维护；此成员不属于公开 SDK，类型契约集中在 `OpenFiles`。实际观察表明，反向链接、出链和大纲的延迟视图也会保存 `state.file`，加载后继承 `FileView` 但关闭 `navigation`，其文件表示关联目标。宿主的活动文件视图选择也使用这一导航标志。注册外的第三方替代编辑视图及其他宿主版本需要独立验证。
+
 ## 原生文件导航内部接口
 
 下列成员未由公开的文件导航 API 承诺，集中在 [NativeExplorer](../../src/FileNavigation/NativeExplorer.ts)。表中宿主行为是在 Obsidian 1.13.7 的 Debug-Vault 中读取方法实现所得的源码观察，实际插件协作结果以[验证记录](Verification.md)为准。

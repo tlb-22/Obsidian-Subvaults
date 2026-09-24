@@ -58,17 +58,20 @@ module.exports = async app => {
     const file = app.vault.getFileByPath('Outside.md');
     const prior = []; app.workspace.iterateAllLeaves(leaf => { if (leaf.getViewState().state?.file === file.path) prior.push(leaf); });
     for (const leaf of prior) leaf.detach();
+    await waitFor(() => !top().includes(file.path), 'Previous external tabs did not close');
     const a = app.workspace.getLeaf('tab'); await a.openFile(file);
     const b = app.workspace.getLeaf('tab'); await b.openFile(file); await delay(100);
     check(a !== b, 'Test requires two distinct file leaves');
     check(top().filter(p => p === file.path).length === 1, 'External duplicate or missing item');
     check(v.getSortedFolderItems(app.vault.getRoot()).find(i => i.file === file) === v.fileItems[file.path], 'External item is not native');
     check(v.fileItems[file.path].el.classList.contains('sv-external'), 'External styling missing');
-    check(v.fileItems[file.path].el.classList.contains('sv-external-first'), 'Divider missing');
+    const external = v.getSortedFolderItems(app.vault.getRoot()).filter(item => !item.file.path.startsWith('Projects/'));
+    check(external[0].el.classList.contains('sv-external-first'), 'First external item has no divider');
+    check(external.slice(1).every(item => !item.el.classList.contains('sv-external-first')), 'Divider repeated after the first external item');
     v.revealInFolder(file); await delay(60);
     check(session().navigation.selection.id === projectId, 'Reveal changed subvault');
     a.detach(); await delay(60); check(top().includes(file.path), 'Closing one tab removed live external file');
-    b.detach(); await delay(100); check(!top().includes(file.path), 'Closed external file remained');
+    b.detach(); await waitFor(() => !top().includes(file.path), 'Closed external file remained');
   });
   await run('switching preserves native folds and workspace tabs', async () => {
     await select(projectId);
