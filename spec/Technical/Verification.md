@@ -7,9 +7,9 @@
 | `npm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
 | `npm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `npm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
-| `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.2 沿用原图 |
+| `npm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.3 沿用原图 |
 | `npm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
-| `npm run package:release -- 0.1.2` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `npm run package:release -- 0.1.3` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
@@ -22,6 +22,8 @@
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
 [截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260921-082649-537-readme-capture-38153/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+
+0.1.3 本地发布准备通过 21 项测试、类型检查和截图引用检查。六张截图重命名并更新 README 引用，逐字节确认画面内容不变；发布目录 `.artifacts/releases/0.1.3/`、ZIP、Debug-Vault 和 Default 的三个安装文件均与构建一致，Default 的 `data.json` 保持不变。安装前备份位于 `.artifacts/backups/20260924-031303-621-release-0-1-3-45860/`。宿主重载与最终实机回归仍待完成；本版本尚未推送。
 
 0.1.2 本地发布准备已通过全部 18 项测试、类型检查和截图引用检查。`.artifacts/releases/0.1.2/` 的三个安装文件、ZIP 内文件及 Debug-Vault 安装文件与构建输出逐字节一致；ZIP 根目录恰含三个安装文件。六张截图沿用 0.1.1 的已验证画面，仅重命名为 0.1.2 并更新两份 README 引用，SHA-256 确认图片内容不变。Debug-Vault 已重载并确认运行 0.1.2，标题与切换条各一份，配置和选择保持不变。核对记录保存于 `.artifacts/scratch/probes/20260923-134551-438-release-0-1-2-33614/`；延迟加载修复的实机验收见下文。本版本的远程 CI 与发布尚未执行。
 
