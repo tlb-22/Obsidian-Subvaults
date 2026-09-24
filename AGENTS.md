@@ -27,9 +27,9 @@
 
 ## 开发规范
 
-- 目录生命周期：`dist/` 为编译输出，`.artifacts/` 按用途和运行时间组织开发产物，`TestVaults/` 为测试用的 Obsidian vault 环境；分类与清理约定见[开发产物](spec/Technical/DevelopmentArtifacts.md)。
+- 目录生命周期：开发目录、本地配置与产物清理遵循[开发产物](spec/Technical/DevelopmentArtifacts.md)约定。
 - 开发验证：插件变更通过检查后，将构建同步到 TestVaults/Debug-Vault/ 并重新加载验证；
-- 版本更新：更新版本号后，依次更新截图（外观不变时只重命名并更新引用，否则重新截图）、同步到本地 Default Vault、在版本提交上添加标签。
+- 版本更新：按[检查与发布](spec/Technical/ContinuousIntegration.md#发布)完成版本准备与发布流程。
 
 ## Git 操作
 

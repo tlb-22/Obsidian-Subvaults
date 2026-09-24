@@ -6,9 +6,9 @@ Check 依次运行 `npm ci`、`npm test`、`npm run build` 和 `npm run screensh
 
 ## 发布
 
-1. 更新 `manifest.json`、`package.json` 与依赖锁文件中的项目版本，完成本地验证并刷新截图。
-2. 提交代码，推送到 `main`。
-3. 创建并推送与 manifest 完全一致的版本标签，例如 `0.1.0`。
+1. 更新 `manifest.json`、`package.json` 与依赖锁文件中的项目版本，完成本地验证；外观不变时重命名截图并更新引用，否则重新截图。
+2. 将构建同步到 `config.local.json` 的 `defaultVaultPath` 指定的本地 vault，创建版本提交，并在该提交上添加与 manifest 完全一致的版本标签，例如 `0.1.0`。
+3. 等待用户明确要求后推送 `main` 与版本标签。
 
 标签格式为 `x.y.z`，遵循 [Obsidian 的版本标签约定](https://docs.obsidian.md/plugins/releasing/submit-plugin)。[打包脚本](../../scripts/package-release.mjs) 校验标签、manifest 和 package 的版本，以及构建 manifest 是否与源码一致；通过后将三个安装文件及 ZIP 写入 `.artifacts/releases/<version>/`。已有版本目录不会被覆盖。
 

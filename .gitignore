@@ -6,3 +6,4 @@ TestVaults/
 node_modules/
 dist/
 .artifacts/
+config.local.json

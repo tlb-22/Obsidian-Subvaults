@@ -16,6 +16,20 @@
 
 [artifact-run.cjs](../../scripts/artifact-run.cjs) 为命令行工具和 Obsidian 宿主验收共用的分配入口。运行目录通过独占创建避免覆盖历史记录；宿主验收先检查 vault 归属，再创建产物目录。`readme-capture.lock` 是截图任务的固定互斥文件，位于 `scratch/probes/`，完成或失败后移除。
 
+## 本地配置
+
+项目根目录的 `config.local.json` 保存本机配置，其中 `defaultVaultPath` 是 Default Vault 的绝对路径，供本地版本更新时确定构建安装目标。同步时读取该字段，将 `dist/` 的三个安装文件复制到目标 vault 的 `.obsidian/plugins/subvaults/`，保留 `data.json`。
+
+该文件由 Git 忽略；个人路径只写在此文件中。其他开发者按自己的目录创建配置，例如：
+
+```json
+{
+  "defaultVaultPath": "/absolute/path/to/vault"
+}
+```
+
+常规构建和 CI 不依赖本地配置。
+
 ## 维护
 
 没有相关任务运行时，可以删除整个 `.artifacts/scratch/`。它不承担配置存储或源码职责；可重复执行的逻辑放在 `scripts/`、`tests/`，有长期价值的结论写入 `spec/`。缓存与备份独立于 scratch，便于分别清理。上述目录均由 Git 忽略。
