@@ -7,9 +7,9 @@
 | `pnpm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
 | `pnpm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `pnpm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
-| `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.1 捕获通过；0.1.3 沿用原图 |
+| `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.4 捕获通过 |
 | `pnpm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
-| `pnpm run package:release 0.1.3` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `pnpm run package:release 0.1.4` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘位置保持与手动滚动、保存失败及重载恢复 | 当前宿主 7 项通过，1 项悬停提示检查失败；主题覆盖与复验见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
@@ -22,6 +22,8 @@
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
 [截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260921-082649-537-readme-capture-38153/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+
+2026-10-12，提交 `5ddad8a` 的[主分支 CI](https://github.com/tlb-22/Obsidian-Subvaults/actions/runs/38231077773)通过依赖安装、测试、构建与截图引用检查。随后在本地准备 0.1.4：21 项测试、类型检查、构建与截图检查通过，中英文六张截图在 Obsidian 1.14.4 中重新捕获，All 和 Research 画面中的浅灰轨道经目视确认可见。`.artifacts/releases/0.1.4/` 的三个安装文件、ZIP、Debug-Vault 和 Default 安装文件与最终构建逐字节一致，ZIP 根目录恰含三个安装文件；复制安装文件时 Default 的 `data.json` 保持不变。Debug-Vault 和 Default 均已重载到 0.1.4；Default 的 4 个 subvault 配置、原选择、活动笔记、编辑器标签和主题保持，切换条只有一份。0.1.4 的版本准备与样式修正保留在本地，版本 CI 和远程发布待推送后执行。
 
 2026-09-24，在 Node.js 24.21.0 / pnpm 12.6.0 下完成冻结锁文件的全新安装，21 项测试、类型检查、构建、Debug-Vault 同步、截图引用与源码摘要读取均通过。依赖的 70 个包版本与迁移前一致，三个安装文件逐字节一致；临时项目通过 `pnpm run package:release 0.1.3` 打包并核对 ZIP。记录位于 `.artifacts/scratch/tests/20260924-082033-585-pnpm-migration-69879/results.json`。本次未运行远程 CI、重新捕获截图或重载宿主。
 
