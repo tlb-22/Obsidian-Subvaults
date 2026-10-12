@@ -44,13 +44,13 @@
 .sv-header-icon { display: flex; flex: 0 0 20px; }
 .sv-header-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-ui-medium); font-weight: var(--font-semibold); }
 .sv-switcher { position: relative; display: flex; align-items: flex-start; gap: 4px; flex: 0 0 auto; padding: 8px; border-top: 1px solid var(--background-modifier-border); }
-/* 固定保留轨道空间；标准配色交回局部伪元素，使尺寸与宿主主题色同时生效。 */
+/* 固定保留可见轨道；颜色来自宿主，局部不透明度保持轨道与滑块的深浅层次。 */
 .sv-switcher-rail { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; padding-bottom: 4px; overflow-x: scroll; scrollbar-width: auto; scrollbar-color: auto; }
 .sv-switcher-rail:empty { padding-top: 30px; }
-.sv-switcher-rail::-webkit-scrollbar { height: 3px; }
-.sv-switcher-rail::-webkit-scrollbar-track { border-radius: 3px; background-color: var(--scrollbar-bg); }
-.sv-switcher-rail::-webkit-scrollbar-thumb { border-width: 0; border-radius: 3px; background-color: var(--scrollbar-thumb-bg); }
-.sv-switcher-rail::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-active-thumb-bg); }
+.sv-ui .sv-switcher-rail::-webkit-scrollbar { display: block; height: 3px; }
+.sv-ui .sv-switcher-rail::-webkit-scrollbar-track { border-radius: 3px; background-color: rgb(from var(--scrollbar-thumb-bg) r g b / 5%); }
+.sv-ui .sv-switcher-rail::-webkit-scrollbar-thumb { border-width: 0; border-radius: 3px; background-color: rgb(from var(--scrollbar-thumb-bg) r g b / 10%); }
+.sv-ui .sv-switcher-rail::-webkit-scrollbar-thumb:hover { background-color: rgb(from var(--scrollbar-active-thumb-bg) r g b / 20%); }
 .sv-ui button.sv-icon-button { flex: 0 0 30px; width: 30px; height: 30px; padding: 5px; border: 0; background: transparent; color: var(--icon-color); }
 .sv-ui button.sv-icon-button:hover, .sv-ui button.sv-icon-button[aria-pressed="true"] { background: var(--background-modifier-hover); }
 .sv-ui button.sv-icon-button[aria-pressed="true"] { box-shadow: inset 0 -2px currentColor; }
