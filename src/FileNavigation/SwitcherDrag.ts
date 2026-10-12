@@ -1,4 +1,4 @@
-/** 管理切换条内的原生拖放、插入提示及边缘滚动；落点提交交给业务层。 */
+/** 管理切换条内的原生拖放与插入提示；落点提交交给业务层。 */
 import { subvaultId, type SubvaultId } from '../Subvaults/Subvault';
 import type { SubvaultPosition } from '../Subvaults/SubvaultOrder';
 import { dismissTooltip } from '../Presentation/Controls';
@@ -11,7 +11,6 @@ export class SwitcherDrag {
   private readonly marker: HTMLElement;
   private source: DragSource | null = null;
   private pointerX: number | null = null;
-  private frame: number | null = null;
   constructor(private readonly rail: HTMLElement, private readonly move: (id: SubvaultId, position: SubvaultPosition) => void) {
     this.win = rail.ownerDocument.defaultView!;
     this.marker = rail.ownerDocument.createElement('div');
@@ -72,24 +71,9 @@ export class SwitcherDrag {
     if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
     this.pointerX = event.clientX;
     this.preview();
-    if (this.frame === null) this.frame = this.win.requestAnimationFrame(this.scroll);
-  };
-  private readonly scroll = (): void => {
-    this.frame = null;
-    if (this.pointerX === null) return;
-    const rect = this.rail.getBoundingClientRect(), edge = Math.min(24, rect.width / 3);
-    const speed = this.pointerX < rect.left + edge ? -8 : this.pointerX > rect.right - edge ? 8 : 0;
-    const previous = this.rail.scrollLeft;
-    this.rail.scrollLeft += speed;
-    if (this.rail.scrollLeft !== previous) {
-      this.preview();
-      this.frame = this.win.requestAnimationFrame(this.scroll);
-    }
   };
   private clearPreview(): void {
     this.pointerX = null;
-    if (this.frame !== null) this.win.cancelAnimationFrame(this.frame);
-    this.frame = null;
     this.preview();
   }
   private readonly leave = (event: DragEvent): void => {

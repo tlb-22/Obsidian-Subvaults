@@ -1,4 +1,4 @@
-/** 在 Debug-Vault 派发宿主拖放事件，验证排序、取消、边缘滚动及持久化，最后恢复原顺序。 */
+/** 在 Debug-Vault 派发宿主拖放事件，验证排序、取消、手动滚动及持久化，最后恢复原顺序。 */
 module.exports = async app => {
   require('./debug-vault.cjs')(app);
   const { writeFileSync } = require('node:fs');
@@ -142,26 +142,29 @@ module.exports = async app => {
       check(!over.defaultPrevented && !dropped.defaultPrevented, 'External drag was accepted');
       check(equal(order(), before) && equal(session().navigation.selection, selection), 'External drop changed plugin state');
     });
-    await run('narrow rail scrolls to hidden targets and stops scrolling after cancellation', async () => {
+    await run('edge dragging preserves scroll position and manual scrolling updates the insertion marker', async () => {
       const strip = rail().parentElement, previousWidth = strip.style.width;
+      const delay = () => new Promise(resolve => win.setTimeout(resolve, 120));
       try {
         strip.style.width = '140px'; rail().scrollLeft = 0;
         check(rail().scrollWidth > rail().clientWidth, 'Rail did not overflow');
         const source = buttons()[0], transfer = begin(source), r = rail().getBoundingClientRect();
         event(rail(), 'dragover', transfer, r.right - 1);
-        await waitFor(() => rail().scrollLeft >= rail().scrollWidth - rail().clientWidth - 1);
-        const last = buttons().at(-1).getBoundingClientRect();
-        check(!marker().hidden && markerCenter() > last.right, 'Hidden last target is inaccessible');
-        const reached = rail().scrollLeft;
+        await delay();
+        check(rail().scrollLeft === 0, 'Dragging at the right edge scrolled the rail');
+        const previousMarker = markerCenter();
+        rail().dispatchEvent(new win.WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 60 }));
+        check(rail().scrollLeft > 0, 'Manual wheel scrolling did not move the rail');
+        await waitFor(() => !marker().hidden && markerCenter() !== previousMarker);
         end(source, transfer);
-        await new Promise(resolve => win.setTimeout(resolve, 60));
-        check(rail().scrollLeft === reached && marker().hidden, 'Edge scrolling continued after cancellation');
+        check(marker().hidden, 'Insertion marker survived cancellation');
         rail().scrollLeft = rail().scrollWidth;
-        const backwards = begin(buttons().at(-1));
+        const reached = rail().scrollLeft, last = buttons().at(-1), backwards = begin(last);
         event(rail(), 'dragover', backwards, r.left + 1);
-        await waitFor(() => rail().scrollLeft === 0);
-        end(buttons().at(-1), backwards);
-      } finally { strip.style.width = previousWidth; }
+        await delay();
+        check(rail().scrollLeft === reached, 'Dragging at the left edge scrolled the rail');
+        end(last, backwards);
+      } finally { event(rail(), 'dragend', new win.DataTransfer(), 0); strip.style.width = previousWidth; }
     });
     await run('failed drop preserves committed order and reports an error', async () => {
       await session().navigation.flush();

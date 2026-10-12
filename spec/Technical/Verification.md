@@ -11,7 +11,7 @@
 | `pnpm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
 | `pnpm run package:release 0.1.3` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
-| `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘滚动、保存失败与重载恢复 | 8 项通过；主题覆盖见下文 |
+| `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘位置保持与手动滚动、保存失败及重载恢复 | 当前宿主 7 项通过，1 项悬停提示检查失败；主题覆盖与复验见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
 | `tests/obsidian/verify-open-files.cjs` | 辅助面板与真实文件标签的区分、延迟标签、重复与关闭、Canvas 和侧栏文件标签 | 最终构建待实机复验 |
 
@@ -57,6 +57,8 @@
 
 ## 主题实机验证
 
+2026-10-12，在 Obsidian 1.14.4 的 Debug-Vault 当前 Catppuccin 配置中同步并重载构建，确认轨道的计算高度与实际占用均为 3 px。320、140 px 宽度及空列表检查中，切换条高度均为 54 px，固定入口与图标按钮保持同排对齐；四边内边距均为 8 px，图标与轨道间隔为 4 px。原生轨道在不溢出时仅显示灰色背景，溢出时显示稍深的滑块；派发双向滚轮事件使溢出区域的位置从 0 到 60 再回到 0。[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs) 的排序、取消、固定入口、边缘位置保持与手动滚动、保存失败及重载恢复等 7 项通过：在左右边缘分别停留 120 ms 时滚动位置保持不变，拖动期间手动滚轮滚动后插入提示随之更新。拖拽开始时关闭已显示悬停提示的检查失败，该问题在同一宿主的原始构建中也已复现。验证后恢复原顺序、选择、宽度与滚动位置；系统鼠标拖动、触控板操作及其他宿主、主题组合未在本次验证。
+
 2026-09-21，在 Obsidian 1.13.7 的 Debug-Vault 重载当前构建后完成 24 组检查：默认主题、Catppuccin 0.4.49、Minimal 9.0.2，分别覆盖深浅色模式及 140、180、240、320 px 宽度。Catppuccin 样式取自本机安装版本，Minimal 取自[官方 9.0.2 源码](https://github.com/kepano/obsidian-minimal/tree/9.0.2)。
 
 脚本将完整主题 CSS 临时放在插件样式之后加载，检查切换按钮与图标尺寸、身份色、选中标记、主按钮及外部文件选中配色、统一圆角、上下操作行对齐、图标和颜色网格、视口边界、选择与键盘焦点恢复。报告为 `.artifacts/scratch/tests/20260921-052538-273-appearance-verification-21544/results.json`。默认主题及 Catppuccin 的创建面板、颜色弹层、切换条另经目视检查。
@@ -75,7 +77,7 @@
 
 同日，在报告问题的 Default vault 更新并重新启用修复构建：文件导航原本处于 `isDeferred === true` 的后台状态，重载保持原生占位视图且无新增错误；显示导航后自动接入，标题与切换条各一份。3 个已有 subvault、当前选择、编辑器标签页与当前笔记保持不变；安装时 `data.json` 逐字节不变。验证报告为 `.artifacts/scratch/probes/20260923-134048-252-default-deferred-fix-33276/results.json`，原安装文件与配置副本保存在该目录的 `before/` 下。
 
-2026-09-21，同步构建并重新加载 Debug-Vault 后，通过[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs)派发 DOM 拖放事件。默认主题、Catppuccin 0.4.49 和 Minimal 9.0.2 的深浅模式均通过 8 项检查：各插入位置对齐；前后移动保持按钮与文件树节点、焦点和选择；取消清理；原生悬停提示关闭与恢复；固定入口与外部拖放边界；窄侧栏双向边缘滚动；保存失败保留顺序并报错；重载恢复顺序。汇总报告为 `.artifacts/scratch/probes/20260921-080533-069-insertion-theme-review-36578/results.json`，各次运行结束后恢复原顺序、主题和深浅模式。该检查覆盖宿主事件与存储协作；系统鼠标拖动尚未完成端到端验证。
+2026-09-21，同步构建并重新加载 Debug-Vault 后，通过[拖拽排序验收](../../tests/obsidian/verify-reorder.cjs)派发 DOM 拖放事件。默认主题、Catppuccin 0.4.49 和 Minimal 9.0.2 的深浅模式均通过当时的 8 项检查，涵盖各插入位置对齐、前后移动时按钮与文件树节点及焦点和选择保持、取消清理、原生悬停提示关闭与恢复、固定入口与外部拖放边界、保存失败保留顺序及报错、重载恢复顺序。汇总报告为 `.artifacts/scratch/probes/20260921-080533-069-insertion-theme-review-36578/results.json`，各次运行结束后恢复原顺序、主题和深浅模式。该检查覆盖宿主事件与存储协作；系统鼠标拖动尚未完成端到端验证。
 
 插入位置检查覆盖每个源按钮、4 px 与 10 px 间距、所有内部间隙及首尾，竖条中心与预期位置的偏差小于 0.1 px，拖回原位保持顺序。Catppuccin 浅色下另经目视确认竖条位于间隙中央，结束后提示和拖动状态均清除。
 
