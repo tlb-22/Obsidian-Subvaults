@@ -7,6 +7,7 @@
 | 调用位置 | API 与输入 | 输出及用途 |
 | --- | --- | --- |
 | 插件入口 | `Plugin.loadData()`、`saveData(document)` | 恢复数据或异步保存结果；具体语义见[数据与提交](PluginData.md) |
+| 本机导航存储 | `App.loadLocalStorage(key)`、`saveLocalStorage(key, document)` | 当前 vault 在本机的导航恢复值；公开接口自 1.8.7 提供，键和数据所有权见[数据与提交](PluginData.md) |
 | 会话装配 | `Workspace.onLayoutReady`、`Component.registerEvent` / `register` | 布局就绪与组件清理点 |
 | 文件夹管理 | `Vault.getFolderByPath`、`getAllFolders`，`create` / `rename` / `delete` 事件 | 文件夹存在性、选择候选及真实路径变化 |
 | 导航协调 | `getLeavesOfType`、`WorkspaceLeaf.isDeferred`、`iterateAllLeaves`、`FileView.file`、`WorkspaceLeaf.getViewState` | 文件导航实例、原生加载状态与工作区标签页的文件路径 |

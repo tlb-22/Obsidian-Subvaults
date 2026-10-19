@@ -1,12 +1,12 @@
-/** 验证异步提交、共享存储和导航恢复的实际协作边界及失败结果。 */
+/** 验证异步配置提交、独立导航存储和恢复的实际协作边界及失败结果。 */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { folderPath, iconId, subvaultId, type Subvault } from '../src/Subvaults/Subvault';
 import { SubvaultCatalog } from '../src/Subvaults/SubvaultCatalog';
 import { PluginPersistence } from '../src/Persistence/PluginPersistence';
-import { decodeDocument, emptyDocument, type PluginDocument } from '../src/Persistence/PluginDocument';
+import { emptyDocument, type PluginDocument } from '../src/Persistence/PluginDocument';
 import { NavigationSession } from '../src/FileNavigation/NavigationSession';
-import { all, type Selection } from '../src/FileNavigation/NavigationState';
+import { all, emptyNavigation, type NavigationState, type Selection } from '../src/FileNavigation/NavigationState';
 const appearance = { icon: iconId('folder'), color: 'default' as const };
 const existing: Subvault = { ...appearance, id: subvaultId('one'), root: folderPath('Projects') };
 
@@ -26,9 +26,14 @@ test('a failed user edit retains the committed state and a later retry succeeds'
 });
 test('reordering commits atomically, preserves navigation, and survives document reload', async () => {
   const second: Subvault = { ...appearance, id: subvaultId('two'), root: folderPath('Research') };
-  const initial: PluginDocument = { version: 1, subvaults: [existing, second], navigation: { selection: { kind: 'subvault', id: existing.id }, positions: [{ selection: all, top: 123 }] } };
+  const initial: PluginDocument = { subvaults: [existing, second] };
+  const navigation: NavigationState = { selection: { kind: 'subvault', id: existing.id }, positions: [{ selection: all, top: 123 }] };
   let saved = initial, fail = true, published = 0, writes = 0;
-  const persistence = new PluginPersistence(initial, async data => { writes++; if (fail) throw new Error('disk full'); saved = data; });
+  const persistence = new PluginPersistence({
+    loadData: async () => JSON.parse(JSON.stringify(saved)),
+    saveData: async data => { writes++; if (fail) throw new Error('disk full'); saved = data; },
+    loadNavigation: () => navigation, saveNavigation: () => { throw new Error('Reordering must not save navigation'); },
+  });
   const catalog = new SubvaultCatalog(initial.subvaults, persistence, () => true, () => subvaultId('new'));
   catalog.subscribe(() => { assert.deepEqual(catalog.items, saved.subvaults); published++; });
   const position = { anchor: existing.id, side: 'before' as const };
@@ -38,8 +43,9 @@ test('reordering commits atomically, preserves navigation, and survives document
   fail = false;
   assert.ok((await catalog.move(second.id, position)).ok);
   assert.deepEqual(catalog.items, [second, existing]); assert.equal(published, 1);
-  const restored = decodeDocument(JSON.parse(JSON.stringify(saved)));
-  assert.deepEqual(restored.subvaults, [second, existing]); assert.deepEqual(restored.navigation, initial.navigation);
+  const restored = await persistence.load();
+  assert.deepEqual(restored.document.subvaults, [second, existing]);
+  assert.deepEqual(restored.navigation, { selection: navigation.selection, positions: navigation.positions });
   await catalog.move(second.id, position);
   assert.equal(writes, 2); assert.equal(published, 1);
 });
@@ -57,19 +63,34 @@ test('observed deletion removes unavailable folders even if saving fails', async
   const result = await catalog.observe({ kind: 'delete', path: 'Projects' });
   assert.equal(result.ok, false); assert.equal(catalog.items.length, 0);
 });
-test('concurrent document sections preserve each other and failed writes do not become committed', async () => {
-  const writes: PluginDocument[] = []; let reject = false;
-  const persistence = new PluginPersistence(emptyDocument, async data => { await Promise.resolve(); if (reject) throw new Error('disk full'); writes.push(data); });
-  const navigation = { selection: { kind: 'subvault' as const, id: existing.id }, positions: [] };
-  await Promise.all([persistence.saveSubvaults([existing]), persistence.saveNavigation(navigation)]);
-  assert.deepEqual(writes.at(-1), { version: 1, subvaults: [existing], navigation });
-  reject = true; await assert.rejects(persistence.saveSubvaults([])); reject = false;
-  await persistence.saveNavigation(emptyDocument.navigation);
-  assert.deepEqual(writes.at(-1)?.subvaults, [existing]);
+test('browsing persists without writing configuration, even when a configuration write fails', async () => {
+  let saved = emptyDocument, local: NavigationState | null = null, writes = 0, reject = false;
+  const persistence = new PluginPersistence({
+    loadData: async () => saved,
+    saveData: async data => { writes++; await Promise.resolve(); if (reject) throw new Error('disk full'); saved = data; },
+    loadNavigation: () => local, saveNavigation: data => { local = data; },
+  });
+  assert.deepEqual(await persistence.load(), { document: emptyDocument, navigation: emptyNavigation });
+  assert.equal(writes, 0); assert.equal(local, null);
+  const navigation = new NavigationSession(emptyNavigation, state => persistence.saveNavigation(state), error => { throw error; });
+  navigation.remember(all, 180);
+  navigation.switchTo({ kind: 'subvault', id: existing.id });
+  navigation.remember(navigation.selection, 420);
+  await Promise.all([persistence.saveSubvaults([existing]), navigation.flush()]);
+  const before = JSON.stringify(saved);
+  assert.equal(writes, 1);
+  navigation.switchTo(all); await navigation.flush();
+  assert.equal(JSON.stringify(saved), before); assert.equal(writes, 1);
+  assert.deepEqual((await persistence.load()).navigation, navigation.state);
+  reject = true;
+  await assert.rejects(persistence.saveSubvaults([]), /disk full/);
+  navigation.switchTo({ kind: 'subvault', id: existing.id }); await navigation.flush();
+  assert.equal(JSON.stringify(saved), before); assert.equal(writes, 2);
+  assert.deepEqual((await persistence.load()).navigation, navigation.state);
 });
 test('views retain independent scroll positions and deleting the active subvault selects All', () => {
   const selection: Selection = { kind: 'subvault', id: existing.id };
-  const navigation = new NavigationSession(emptyDocument.navigation, async () => undefined, error => { throw error; });
+  const navigation = new NavigationSession(emptyNavigation, async () => undefined, error => { throw error; });
   navigation.remember(all, 180); navigation.switchTo(selection); navigation.remember(selection, 420);
   navigation.switchTo(all); assert.equal(navigation.position(all), 180);
   navigation.switchTo(selection); assert.equal(navigation.position(selection), 420);

@@ -5,7 +5,7 @@
 | 命令 | 验证范围 | 当前结果 |
 | --- | --- | --- |
 | `pnpm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
-| `pnpm test` | 14 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
+| `pnpm test` | 15 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `pnpm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
 | `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.4 捕获通过 |
 | `pnpm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
@@ -14,8 +14,9 @@
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘位置保持与手动滚动、保存失败及重载恢复 | 当前宿主 7 项通过，1 项悬停提示检查失败；主题覆盖与复验见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
 | `tests/obsidian/verify-open-files.cjs` | 辅助面板与真实文件标签的区分、延迟标签、重复与关闭、Canvas 和侧栏文件标签 | 最终构建待实机复验 |
+| `tests/obsidian/verify-navigation-storage.cjs` | 配置与本机导航独立加载、浏览不写配置、重载恢复和排序保存 | 4 项通过 |
 
-[领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索、前后排序与失效身份和存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、共享文档并发写入、排序与创建移除的串行协作及导航恢复。
+[领域测试](../../tests/domain.test.ts) 覆盖重复绑定、重叠文件夹、祖先路径变化、路径段边界、外部文件去重、文件夹搜索、前后排序与失效身份，以及配置和本机导航的存储格式错误。[应用测试](../../tests/application.test.ts) 覆盖异步创建的唯一性、提交失败与重试、真实删除后的保存失败、配置与导航独立写入、排序与创建移除的串行协作及导航恢复。
 
 [工作区文件适配测试](../../tests/open-files.test.ts) 使用宿主边界替身执行实际适配代码，验证已加载和延迟辅助面板的文件引用不构成打开标签，真实文件视图与注册的延迟视图参与列表，以及关闭标签和注册表变化后按当前事实重新计算。该测试不替代真实宿主的接口及事件验证。
 
@@ -56,6 +57,12 @@
 [开发路径](../../scripts/project-paths.cjs) 从模块位置推导项目根目录，供构建、同步、样本准备及宿主验收共用。[宿主入口检查](../../tests/obsidian/debug-vault.cjs) 使用 `FileSystemAdapter.getBasePath()` 和真实目录路径，确保验收只操作该项目的 `TestVaults/Debug-Vault`。项目可以整体移动或重命名；内部测试目录结构保持约定，构建脚本可从其他工作目录调用。
 
 `pnpm run dev` 监听 TypeScript 源码，将开发构建写入 `dist/`；启动构建时同时复制 `src/styles.css` 和 manifest。修改 CSS 后运行 `pnpm run sync:debug` 并重新加载插件以检查效果。同步目录由构建 manifest 的插件 ID 决定。`TestVaults/`、`dist/` 和 `.artifacts/` 均为本地开发目录，由 Git 忽略。
+
+## 本机导航存储验证
+
+2026-10-19，22 项自动化测试、类型检查、构建、Debug-Vault 同步和截图引用检查通过。[导航存储验收](../../tests/obsidian/verify-navigation-storage.cjs) 在 Obsidian 1.14.4 中完成 4 项检查：配置与本机导航独立加载，切换和原生长列表滚动不写 `data.json`，插件重载恢复选择及滚动位置，调整排列顺序只提交配置。滚动事件将位置保存到本机存储，切换及重载后的实际偏差小于 2 px；浏览期间配置写入次数为 0，文件内容逐字节保持。验收结束后恢复原配置、选择与面板。
+
+Debug-Vault 和 Default 的现有配置已手动调整并重载，`data.json` 只含 `subvaults`，本机导航记录只含 `selection` 和 `positions`。Debug-Vault 的 5 个绑定、Default 的 3 个绑定及原选择保留，Default 的标签页和主题保持，切换条各一份；Default 切换和重载期间配置写入次数为 0。两处安装文件与最终构建逐字节一致。本次验证覆盖插件重载，完整应用重启及跨设备行为未实测。
 
 ## 主题实机验证
 

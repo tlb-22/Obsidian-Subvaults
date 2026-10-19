@@ -1,15 +1,24 @@
-/** 串行保存 data.json 的独立数据片段；仅在宿主写入成功后推进已提交快照。 */
+/** 分别读写配置文件和本地导航状态，保持两条存储路径独立。 */
 import type { Subvault } from '../Subvaults/Subvault';
-import type { NavigationState } from '../FileNavigation/NavigationState';
-import type { PluginDocument } from './PluginDocument';
+import { emptyNavigation, type NavigationState } from '../FileNavigation/NavigationState';
+import { decodeDocument, decodeNavigationDocument, type PluginDocument } from './PluginDocument';
+export interface PluginStorage {
+  loadData(): Promise<unknown>;
+  saveData(document: PluginDocument): Promise<void>;
+  loadNavigation(): unknown;
+  saveNavigation(navigation: NavigationState): void;
+}
+export interface PluginState { readonly document: PluginDocument; readonly navigation: NavigationState }
 export class PluginPersistence {
-  private pending: Promise<void> = Promise.resolve();
-  constructor(private committed: PluginDocument, private readonly write: (data: PluginDocument) => Promise<void>) {}
-  private update(change: (current: PluginDocument) => PluginDocument): Promise<void> {
-    const next = this.pending.then(async () => { const data = change(this.committed); await this.write(data); this.committed = data; });
-    this.pending = next.then(() => undefined, () => undefined);
-    return next;
+  constructor(private readonly storage: PluginStorage) {}
+  async load(): Promise<PluginState> {
+    const document = decodeDocument(await this.storage.loadData());
+    const local = this.storage.loadNavigation();
+    const navigation = local === null || local === undefined
+      ? emptyNavigation
+      : decodeNavigationDocument(local);
+    return { document, navigation };
   }
-  saveSubvaults(subvaults: readonly Subvault[]): Promise<void> { return this.update(doc => ({ ...doc, subvaults })); }
-  saveNavigation(navigation: NavigationState): Promise<void> { return this.update(doc => ({ ...doc, navigation })); }
+  saveSubvaults(subvaults: readonly Subvault[]): Promise<void> { return this.storage.saveData({ subvaults }); }
+  async saveNavigation(navigation: NavigationState): Promise<void> { this.storage.saveNavigation(navigation); }
 }

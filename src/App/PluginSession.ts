@@ -1,7 +1,6 @@
 /** 集中装配业务能力与生产适配器，拥有插件会话中的订阅和清理顺序。 */
 import { Component, Notice, TFolder, type App } from 'obsidian';
-import { PluginPersistence } from '../Persistence/PluginPersistence';
-import type { PluginDocument } from '../Persistence/PluginDocument';
+import type { PluginPersistence, PluginState } from '../Persistence/PluginPersistence';
 import { SubvaultCatalog } from '../Subvaults/SubvaultCatalog';
 import { subvaultId } from '../Subvaults/Subvault';
 import { failureMessage } from '../Subvaults/SubvaultFeedback';
@@ -12,12 +11,10 @@ export class PluginSession extends Component {
   readonly catalog: SubvaultCatalog;
   readonly navigation: NavigationSession;
   private readonly explorer: ExplorerCoordinator;
-  private readonly persistence: PluginPersistence;
-  constructor(private readonly app: App, initial: PluginDocument, write: (value: PluginDocument) => Promise<void>) {
+  constructor(private readonly app: App, initial: PluginState, persistence: PluginPersistence) {
     super();
-    this.persistence = new PluginPersistence(initial, write);
-    this.catalog = new SubvaultCatalog(initial.subvaults, this.persistence, path => app.vault.getFolderByPath(path) !== null, () => subvaultId(crypto.randomUUID()));
-    this.navigation = new NavigationSession(initial.navigation, state => this.persistence.saveNavigation(state), this.report);
+    this.catalog = new SubvaultCatalog(initial.document.subvaults, persistence, path => app.vault.getFolderByPath(path) !== null, () => subvaultId(crypto.randomUUID()));
+    this.navigation = new NavigationSession(initial.navigation, state => persistence.saveNavigation(state), this.report);
     this.navigation.reconcile(this.catalog.items);
     this.explorer = new ExplorerCoordinator(app, this.catalog, this.navigation, this.report);
   }

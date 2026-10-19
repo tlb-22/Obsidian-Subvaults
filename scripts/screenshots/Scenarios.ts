@@ -19,12 +19,10 @@ export const expandedFolders = ['Learning', 'Leisure', 'Research', 'Research/Pap
 export const vaultMarker = 'Subvaults screenshot fixtures\n';
 
 export const pluginData: PluginDocument = {
-  version: 1,
   subvaults: [
     { id: subvaultId('11111111-1111-4111-8111-111111111111'), root: folderPath('Learning'), icon: iconId('graduation-cap'), color: 'blue' },
     { id: researchId, root: folderPath('Research'), icon: iconId('flask-conical'), color: 'purple' },
   ],
-  navigation: { selection: { kind: 'all' }, positions: [] },
 };
 
 export const notes: readonly { readonly path: string; readonly content: string }[] = [

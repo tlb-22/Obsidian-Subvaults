@@ -2,9 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSubvault, followFolderChange, folderPath, iconId, subvaultId, type Subvault } from '../src/Subvaults/Subvault';
-import { outsideFiles } from '../src/FileNavigation/NavigationState';
+import { all, outsideFiles } from '../src/FileNavigation/NavigationState';
 import { visibleFolders } from '../src/Subvaults/FolderChoices';
-import { decodeDocument, emptyDocument } from '../src/Persistence/PluginDocument';
+import { decodeDocument, decodeNavigationDocument, emptyDocument } from '../src/Persistence/PluginDocument';
 import { moveSubvault } from '../src/Subvaults/SubvaultOrder';
 const space = (root: string, id = root): Subvault => ({ id: subvaultId(id), root: folderPath(root), icon: iconId('folder'), color: 'default' });
 
@@ -63,7 +63,14 @@ test('invalid storage is reported instead of being reset to an empty configurati
   assert.deepEqual(decodeDocument(null), emptyDocument);
   assert.throws(() => decodeDocument({}));
   assert.throws(() => decodeDocument({ ...emptyDocument, subvaults: [space('A'), space('A', 'b')] }));
-  assert.throws(() => decodeDocument({ ...emptyDocument, navigation: { selection: { kind: 'all' }, positions: [{ selection: { kind: 'all' }, top: -1 }] } }));
   assert.deepEqual(decodeDocument({ ...emptyDocument, subvaults: [space('A')] }).subvaults, [space('A')]);
   for (const invalid of ['', '/', '../A', 'A/../B', '/A', 'A/', 'A//B']) assert.throws(() => folderPath(invalid));
+});
+test('navigation storage rejects invalid positions, duplicate views and invalid selections', () => {
+  const value = { selection: all, positions: [{ selection: all, top: 180 }] };
+  assert.deepEqual(decodeNavigationDocument(value), { selection: all, positions: value.positions });
+  for (const top of [-1, NaN, Infinity]) assert.throws(() => decodeNavigationDocument({ ...value, positions: [{ selection: all, top }] }));
+  assert.throws(() => decodeNavigationDocument({ ...value, positions: [...value.positions, ...value.positions] }));
+  assert.throws(() => decodeNavigationDocument({ ...value, selection: { kind: 'unknown' } }));
+  assert.throws(() => decodeNavigationDocument({ ...value, selection: { kind: 'subvault', id: '' } }));
 });

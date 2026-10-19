@@ -4,6 +4,7 @@ export type Selection = { readonly kind: 'all' } | { readonly kind: 'subvault'; 
 export interface ScrollPosition { readonly selection: Selection; readonly top: number }
 export interface NavigationState { readonly selection: Selection; readonly positions: readonly ScrollPosition[] }
 export const all: Selection = { kind: 'all' };
+export const emptyNavigation: NavigationState = { selection: all, positions: [] };
 export function selectionKey(selection: Selection): string { return selection.kind === 'all' ? 'all' : selection.id; }
 export function sameSelection(a: Selection, b: Selection): boolean { return selectionKey(a) === selectionKey(b); }
 export function outsideFiles(root: FolderPath, openPaths: readonly string[]): readonly string[] {

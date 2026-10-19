@@ -1,6 +1,6 @@
 # 技术文档
 
-Subvaults 按 Subvaults 和 FileNavigation 两个业务能力组织。插件入口连接唯一会话，持久化边界协调同一份 `data.json`，原生文件导航内部接口集中在适配文件中。
+Subvaults 按 Subvaults 和 FileNavigation 两个业务能力组织。插件入口连接唯一会话，持久化边界分别保存配置和本机导航恢复状态，原生文件导航内部接口集中在适配文件中。
 
 ## 导航
 
