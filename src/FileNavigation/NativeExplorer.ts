@@ -89,12 +89,17 @@ export class NativeExplorer {
     this.observer = new win.MutationObserver(() => this.decorate());
     this.observer.observe(v.navFileContainerEl, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-path'] });
     const relayDrop = (event: DragEvent) => {
-      if (this.scope.kind !== 'folder' || event.defaultPrevented || (event.target as HTMLElement).closest('.tree-item')) return;
+      if (this.scope.kind !== 'folder' || event.defaultPrevented) return;
+      // 文件夹节点处理自身和后代的拖放；其余位置原本会冒泡到整个 vault 根目录。
+      if ((event.target as HTMLElement).closest('.nav-folder')) return;
+      event.preventDefault();
       const item = v.fileItems[this.scope.root];
-      if (!item) return;
+      if (!item) {
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'none';
+        return;
+      }
       const relay = new win.DragEvent(event.type, { bubbles: false, cancelable: true, dataTransfer: event.dataTransfer, clientX: event.clientX, clientY: event.clientY, ctrlKey: event.ctrlKey, metaKey: event.metaKey, altKey: event.altKey, shiftKey: event.shiftKey });
       item.el.dispatchEvent(relay);
-      if (relay.defaultPrevented) { event.preventDefault(); event.stopImmediatePropagation(); }
     };
     for (const type of ['dragover', 'dragenter', 'drop'] as const) {
       v.navFileContainerEl.addEventListener(type, relayDrop, true);

@@ -43,6 +43,7 @@
 - [测试样本准备](../../scripts/prepare-debug.mjs)：现存文件保持原样，补充基本文件夹及 160 个长列表样本。
 - [宿主验收脚本](../../tests/obsidian/verify.cjs)：通过 Debug-Vault 的开发控制台执行，内置 vault 路径检查；结果写入 `.artifacts/scratch/tests/<run>/results.json`，运行用途为 `host-verification`。
 - [交互补充验证](../../tests/obsidian/verify-interactions.cjs)：检查路径提示、真实拖放、新建文件夹、逐帧显示及提示清理；结果同样按运行保存，用途为 `interaction-verification`。逐帧检查要求测试窗口保持可见。
+- [文件拖放目标验收](../../tests/obsidian/verify-drop-targets.cjs) 于 2026-11-09 在 Obsidian 1.15.0 的 Debug-Vault 通过。向文件树节点派发拖放事件，核对宿主给出的目标提示和临时笔记的真实路径，覆盖文件自身、同级文件、顶层空白处、子文件夹、嵌套文件行、返回工作文件夹及 All 根目录。
 
 在测试 vault 的开发控制台执行：
 
