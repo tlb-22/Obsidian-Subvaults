@@ -7,9 +7,9 @@
 | `pnpm run check` | 严格 TypeScript 类型检查，包括测试源码 | 通过 |
 | `pnpm test` | 15 项纯规则与应用协作测试，3 项工作区文件适配测试，1 项开发目录搬迁测试，3 项截图工具测试 | 通过 |
 | `pnpm run sync:debug` | 构建插件并同步到固定 Debug-Vault，保留插件数据 | 已执行 |
-| `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.5 沿用 0.1.4 已验证画面 |
+| `pnpm run screenshots` | 独立截图 vault 中的中英文 All、Research、Create 六张侧栏截图 | 0.1.6 沿用已验证画面 |
 | `pnpm run screenshots:check` | 当前版本图片的存在性及 README 引用 | 通过 |
-| `pnpm run package:release 0.1.5` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
+| `pnpm run package:release 0.1.6` | 发布版本一致性、三个安装文件与 ZIP 内容 | 通过 |
 | `tests/obsidian/verify-appearance.cjs` | Debug-Vault 内的主题、深浅模式、窄侧栏及控件状态 | 24 组通过 |
 | `tests/obsidian/verify-reorder.cjs` | 插入提示对齐、拖放排序、悬停提示、取消、固定入口、边缘位置保持与手动滚动、保存失败及重载恢复 | 当前宿主 7 项通过，1 项悬停提示检查失败；主题覆盖与复验见下文 |
 | `tests/obsidian/verify-deferred.cjs` | 原生后台延迟加载、插件重载、首次显示接入、重复布局事件与加载前卸载 | 4 项通过 |
@@ -23,6 +23,8 @@
 [开发目录测试](../../tests/tooling.test.ts) 将项目副本移动到包含空格及中文的新名称目录，再从无关工作目录执行构建、同步和发布打包；核对输出归属、文件及 ZIP 内容、产物分类与共享运行名，并验证版本不符与重复打包会报错，宿主入口拒绝其他 vault 且不创建产物。
 
 [截图工具测试](../../tests/screenshots.test.ts) 覆盖版本图片缺失、捕获过程中源码或图片变化、语言及创建选择不符、README 表格更新，以及拒绝覆盖未标记的现有 vault。[截图流程](ReadmeScreenshots.md) 已在下述 macOS 宿主版本上执行，六张图片经查看确认侧栏裁切、All 与 Research 导航、外部文件分组，以及 Leisure 创建表单正确；中英文宿主分别通过原生控件文字与文档语言核验。场景记录保存在 `.artifacts/scratch/previews/20260921-082649-537-readme-capture-38153/screenshots.json`。其他操作系统的捕获尚未实现，无界面检查仅依赖 Node.js 文件接口。
+
+2026-11-09，0.1.6 通过 22 项自动化测试、类型检查、构建和截图引用检查。中英文 README 的六张图片按版本重命名，内容与 0.1.5 逐字节一致。ZIP 根目录的三个安装文件与构建、Debug-Vault 和 Default 安装文件一致。Default 在 Obsidian 1.15.0 中重载后报告插件版本为 0.1.6，清单、视图选择和活动标签页均保留，文件导航中有一份切换条。两处 vault 的 `data.json` 与更新前逐字节一致。
 
 2026-10-19，0.1.5 本地版本准备完成：22 项测试、类型检查、构建、截图引用与打包检查通过。六张截图沿用 0.1.4 的已验证画面，更新文件名和 README 引用，SHA-256 确认内容不变。`.artifacts/releases/0.1.5/` 的三个安装文件、ZIP 内文件以及 Debug-Vault 和 Default 安装文件均与最终构建逐字节一致，ZIP 根目录恰含三个安装文件。Debug-Vault 和 Default 已刷新插件元数据并重载至 0.1.5，5 个与 3 个绑定及原选择保留，切换条各一份；Default 的标签页和主题保持，两处 `data.json` 内容与版本准备前逐字节一致。本版本尚未推送。
 
